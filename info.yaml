@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        ""      # Project title
+  title:        "Basic Oszilloscope and Signal Generator"      # Project title
   author:       "Pascal Gesell"      # Your name
   discord:      "gfcwfzkm"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "Basic oscilloscope & signal generator on an ASIC"      # One line description of what your project does
