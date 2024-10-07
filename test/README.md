@@ -1,31 +1,5 @@
-# Sample testbench for a Tiny Tapeout project
+# Tests
 
-This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://docs.cocotb.org/en/stable/) to drive the DUT and check the outputs.
-See below to get started or for more information, check the [website](https://tinytapeout.com/hdl/testing/).
+Due to the lack of experience in cocotb and Verilog, the usual tests for TinyTapeout are not available. Instead, a [dummy.v](dummy.v) file is provided to bypass the cocotb tests.
 
-## Setting up
-
-1. Edit [Makefile](Makefile) and modify `PROJECT_SOURCES` to point to your Verilog files.
-2. Edit [tb.v](tb.v) and replace `tt_um_example` with your module name.
-
-## How to run
-
-To run the RTL simulation:
-
-```sh
-make -B
-```
-
-To run gatelevel simulation, first harden your project and copy `../runs/wokwi/results/final/verilog/gl/{your_module_name}.v` to `gate_level_netlist.v`.
-
-Then run:
-
-```sh
-make -B GATES=yes
-```
-
-## How to view the VCD file
-
-```sh
-gtkwave tb.vcd tb.gtkw
-```
+The actual testbenches can be found in [the vhdl directory](vhdl/) and can be run using GHDL or NVC. With the exception of the [debouncer](vhdl/debouncer_tb.vhdl) test, all tests are self-checking.

@@ -4,8 +4,9 @@
 # defaults
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
-SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = generated/project.v
+SRC_DIR = $(PWD)
+PROJECT_SOURCES = dummy.v
+
 
 ifneq ($(GATES),yes)
 
