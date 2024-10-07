@@ -2,6 +2,7 @@
 .idea
 *.vcd
 runs
+tt/
 tt_submission
 src/generated/
 src/user_config.json

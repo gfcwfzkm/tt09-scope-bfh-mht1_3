@@ -1,17 +1,17 @@
 # Tiny Tapeout project information
 project:
   title:        ""      # Project title
-  author:       ""      # Your name
-  discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  ""      # One line description of what your project does
+  author:       "Pascal Gesell"      # Your name
+  discord:      "gfcwfzkm"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
+  description:  "Basic oscilloscope & signal generator on an ASIC"      # One line description of what your project does
   language:     "VHDL"  # other examples include Verilog, SystemVerilog, Amaranth, etc
-  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
+  clock_hz:     25000000       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
   tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_example"
+  top_module:  "tt_um_gfcwfzkm_scope_bfh_mht1_3"
 
   # List your project's source files here.
   # Source files must be in ./src and you must list each source file separately, one per line.
@@ -20,39 +20,47 @@ project:
   # WARNING: VHDL support in Tiny Tapeout is experimental. The template may get changes during
   #          the shuttle and VHDL support may be dropped for future shuttles if we see low usage.
   source_files:
-    - "project.vhdl"
+    - "tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl"  # Top module
+    - "settings/debouncer.vhdl"
+    - "settings/settings.vhdl"
+    - "video/video.vhdl"
+    - "video/vtgen.vhdl"
+    - "video/image_generators/merge_generators.vhdl"
+    - "video/image_generators/channel_gen.vhdl"
+    - "video/image_generators/grid_gen.vhdl"
+    - "video/image_generators/trigger_gen.vhdl"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: ""
-  ui[1]: ""
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
+  ui[0]: "Button 0"
+  ui[1]: "Button 1"
+  ui[2]: "Button 2"
+  ui[3]: "Button 3"
+  ui[4]: "Switch 0"
+  ui[5]: "Switch 1"
+  ui[6]: "FRAM MISO"
+  ui[7]: "ADC MISO"
 
   # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[0]: "FRAM SCLK"
+  uo[1]: "FRAM MOSI"
+  uo[2]: "FRAM CS"
+  uo[3]: "ADC SCLK"
+  uo[4]: "ADC CS"
+  uo[5]: "DAC SCLK"
+  uo[6]: "DAC MOSI"
+  uo[7]: "DAC CS"
 
   # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "HDMI Pmod Green"
+  uio[1]: "HDMI Pmod Clock"
+  uio[2]: "HDMI Pmod HSYNC"
+  uio[3]: "Ring Oscillator"
+  uio[4]: "HDMI Pmod Red"
+  uio[5]: "HDMI Pmod Blue"
+  uio[6]: "HDMI Pmod DE"
+  uio[7]: "HDMI Pmod VSYNC"
 
 # Do not change!
 yaml_version: 6
