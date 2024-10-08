@@ -40,12 +40,12 @@ begin
 	offset <= '1' when disp_x < to_unsigned(c_LINEWIDTH, c_HDMI_H_BITWIDTH) and disp_y = offsetCalced else '0';
 	
 	currentSampleCalced <= shift_right((resize(unsigned(currentSample), c_HDMI_V_BITWIDTH)), to_integer(-chAmplitude)) + offsetCalced	when chAmplitude < 0 else
-						   resize(currentSample, c_HDMI_V_BITWIDTH) + offsetCalced												when chAmplitude = 0 else
+						   resize(currentSample, c_HDMI_V_BITWIDTH) + offsetCalced														when chAmplitude = 0 else
 						   shift_left((resize(currentSample, c_HDMI_V_BITWIDTH)), to_integer(chAmplitude)) + offsetCalced;
 	
-	lastSampleCalced <= shift_right((resize(unsigned(lastSample), c_HDMI_V_BITWIDTH)), to_integer(-chAmplitude)) + offsetCalced		when chAmplitude < 0 else
-						   resize(lastSample, c_HDMI_V_BITWIDTH) + offsetCalced													when chAmplitude = 0 else
-						   shift_left((resize(unsigned(lastSample), c_HDMI_V_BITWIDTH)), to_integer(chAmplitude)) + offsetCalced;
+	lastSampleCalced <= shift_right((resize(unsigned(lastSample), c_HDMI_V_BITWIDTH)), to_integer(-chAmplitude)) + offsetCalced	when chAmplitude < 0 else
+						resize(lastSample, c_HDMI_V_BITWIDTH) + offsetCalced													when chAmplitude = 0 else
+						shift_left((resize(unsigned(lastSample), c_HDMI_V_BITWIDTH)), to_integer(chAmplitude)) + offsetCalced;
 	
 	lineMode <= '1' when (disp_y >= currentSampleCalced and disp_y <= lastSampleCalced) or
 						 (disp_y <= currentSampleCalced and disp_y >= lastSampleCalced) else '0';

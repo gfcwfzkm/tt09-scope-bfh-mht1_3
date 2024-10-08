@@ -24,10 +24,11 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			frame_end : out std_logic;
 			currentSample : in unsigned(7 downto 0);
 			lastSample : in unsigned(7 downto 0);
+			display_samples : in std_logic;
 			chAmplitude : in signed(2 downto 0);
 			chOffset : in unsigned(4 downto 0);
 			triggerXPos :  unsigned(3 downto 0);
-			triggerYPos :  unsigned(4 downto 0);
+			triggerYPos :  unsigned(3 downto 0);
 		  	r : out std_logic;
 		  	g : out std_logic;
 		  	b : out std_logic;
@@ -45,16 +46,19 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			buttons : in std_logic_vector(3 downto 0);
 			switches : in std_logic_vector(1 downto 0);
 			trigger_start : out std_logic;
+			triggerOnRisingEdge : out std_logic;
+			displayDotSamples : out std_logic;
 			chAmplitude : out signed(2 downto 0);
 			chOffset : out unsigned(4 downto 0);
 			triggerXPos : out unsigned(3 downto 0);
-			triggerYPos : out unsigned(4 downto 0);
+			triggerYPos : out unsigned(3 downto 0);
 			timebase : out unsigned(3 downto 0);
 			memoryShift : out signed(7 downto 0)
 		);
 	end component;
 
 	signal reset          : std_logic;
+	signal display_samples : std_logic;
 	signal frame_end	  : std_logic;
 	signal line_end		  : std_logic;
 
@@ -62,9 +66,11 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 	signal chAmplitude	  : signed(2 downto 0);
 	signal chOffset		  : unsigned(4 downto 0);
 	signal triggerXPos	  : unsigned(3 downto 0);
-	signal triggerYPos	  : unsigned(4 downto 0);
+	signal triggerYPos	  : unsigned(3 downto 0);
 	signal timebase		  : unsigned(3 downto 0);
 	signal memoryShift	  : signed(7 downto 0);
+	signal triggerOnRisingEdge : std_logic;
+	signal displayDotSamples : std_logic;
 begin
 
 	-- Make the reset active-high
@@ -82,6 +88,7 @@ begin
 		frame_end	=> frame_end,
 		currentSample => to_unsigned(120, 8),
 		lastSample	=> to_unsigned(120, 8),
+		display_samples => display_samples,
 		chAmplitude	=> chAmplitude,
 		chOffset	=> chOffset,
 		triggerXPos	=> triggerXPos,
@@ -104,6 +111,8 @@ begin
 		buttons		=> ui_in(3 downto 0),
 		switches	=> ui_in(5 downto 4),
 		trigger_start => trigger_start,
+		triggerOnRisingEdge => triggerOnRisingEdge,
+		displayDotSamples => displayDotSamples,
 		chAmplitude	=> chAmplitude,
 		chOffset	=> chOffset,
 		triggerXPos	=> triggerXPos,

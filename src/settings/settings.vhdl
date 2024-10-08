@@ -14,11 +14,13 @@ entity settings is
 		switches : in std_logic_vector(1 downto 0);
 
 		trigger_start : out std_logic;
+		triggerOnRisingEdge : out std_logic;
+		displayDotSamples : out std_logic;
 
 		chAmplitude : out signed(2 downto 0);
 		chOffset : out unsigned(4 downto 0);
 		triggerXPos : out unsigned(3 downto 0);
-		triggerYPos : out unsigned(4 downto 0);
+		triggerYPos : out unsigned(3 downto 0);
 		timebase : out unsigned(3 downto 0);
 		memoryShift : out signed(7 downto 0)
 	);
@@ -37,24 +39,26 @@ architecture rtl of settings is
 		);
 	end component;
 
-	constant AMPLITUDE_DEFAULT : signed(2 downto 0)	:= to_signed(0,	chAmplitude'length);
-	constant AMPLITUDE_MIN : signed(2 downto 0)		:= to_signed(-2,	chAmplitude'length);
-	constant AMPLITUDE_MAX : signed(2 downto 0)		:= to_signed(2,		chAmplitude'length);
-	constant OFFSET_DEFAULT : unsigned(4 downto 0)	:= to_unsigned(4,	chOffset'length);
-	constant OFFSET_MAX : unsigned(4 downto 0)		:= to_unsigned(19,	chOffset'length);
-	constant OFFSET_MIN : unsigned(4 downto 0)		:= to_unsigned(0,	chOffset'length);
-	constant TRIGGER_X_DEFAULT : unsigned(3 downto 0)	:= to_unsigned(8,	triggerXPos'length);
-	constant TRIGGER_X_MAX : unsigned(3 downto 0)	:= to_unsigned(15,	triggerXPos'length);
-	constant TRIGGER_X_MIN : unsigned(3 downto 0)	:= to_unsigned(0,	triggerXPos'length);
-	constant TRIGGER_Y_DEFAULT : unsigned(4 downto 0)	:= to_unsigned(3,	triggerYPos'length);
-	constant TRIGGER_Y_MAX : unsigned(4 downto 0)	:= to_unsigned(19,	triggerYPos'length);
-	constant TRIGGER_Y_MIN : unsigned(4 downto 0)	:= to_unsigned(0,	triggerYPos'length);
-	constant TIMEBASE_DEFAULT : unsigned(3 downto 0)	:= to_unsigned(0,	timebase'length);
-	constant TIMEBASE_MAX : unsigned(3 downto 0)	:= to_unsigned(15,	timebase'length);
-	constant TIMEBASE_MIN : unsigned(3 downto 0)	:= to_unsigned(0,	timebase'length);
-	constant MEMORY_SHIFT_DEFAULT : signed(7 downto 0)	:= to_signed(0,	memoryShift'length);
-	constant MEMORY_SHIFT_MAX : signed(7 downto 0)	:= to_signed(127,	memoryShift'length);
-	constant MEMORY_SHIFT_MIN : signed(7 downto 0)	:= to_signed(-127,	memoryShift'length);
+	constant AMPLITUDE_DEFAULT : signed(chAmplitude'length-1 downto 0)		:= to_signed(0,		chAmplitude'length);
+	constant AMPLITUDE_MIN : signed(chAmplitude'length-1 downto 0)			:= to_signed(-2,	chAmplitude'length);
+	constant AMPLITUDE_MAX : signed(chAmplitude'length-1 downto 0)			:= to_signed(2,		chAmplitude'length);
+	constant OFFSET_DEFAULT : unsigned(chOffset'length-1 downto 0)			:= to_unsigned(4,	chOffset'length);
+	constant OFFSET_MAX : unsigned(chOffset'length-1 downto 0)				:= to_unsigned(19,	chOffset'length);
+	constant OFFSET_MIN : unsigned(chOffset'length-1 downto 0)				:= to_unsigned(0,	chOffset'length);
+	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0)	:= to_unsigned(8,	triggerXPos'length);
+	constant TRIGGER_X_MAX : unsigned(triggerXPos'length-1 downto 0)		:= to_unsigned(15,	triggerXPos'length);
+	constant TRIGGER_X_MIN : unsigned(triggerXPos'length-1 downto 0)		:= to_unsigned(0,	triggerXPos'length);
+	constant TRIGGER_Y_DEFAULT : unsigned(triggerYPos'length-1 downto 0)	:= to_unsigned(4,	triggerYPos'length);
+	constant TRIGGER_Y_MAX : unsigned(triggerYPos'length-1 downto 0)		:= to_unsigned(15,	triggerYPos'length);
+	constant TRIGGER_Y_MIN : unsigned(triggerYPos'length-1 downto 0)		:= to_unsigned(0,	triggerYPos'length);
+	constant TIMEBASE_DEFAULT : unsigned(timebase'length-1 downto 0)		:= to_unsigned(0,	timebase'length);
+	constant TIMEBASE_MAX : unsigned(timebase'length-1 downto 0)			:= to_unsigned(15,	timebase'length);
+	constant TIMEBASE_MIN : unsigned(timebase'length-1 downto 0)			:= to_unsigned(0,	timebase'length);
+	constant MEMORY_SHIFT_DEFAULT : signed(memoryShift'length-1 downto 0)	:= to_signed(0,		memoryShift'length);
+	constant MEMORY_SHIFT_MAX : signed(memoryShift'length-1 downto 0)		:= to_signed(127,	memoryShift'length);
+	constant MEMORY_SHIFT_MIN : signed(memoryShift'length-1 downto 0)		:= to_signed(-127,	memoryShift'length);
+	constant TRIGGER_ON_RISING_EDGE_DEFAULT : std_logic	:= '1';
+	constant DISPLAY_DOT_SAMPLES_DEFAULT : std_logic	:= '1';
 
 	signal debounced_buttons_pressed : std_logic_vector(3 downto 0);
 	signal debounced_switches : std_logic_vector(1 downto 0);
@@ -65,6 +69,8 @@ architecture rtl of settings is
 	signal triggerYPos_reg, triggerYPos_next : unsigned(triggerYPos'length-1 downto 0);
 	signal timebase_reg, timebase_next : unsigned(timebase'length-1 downto 0);
 	signal memoryShift_reg, memoryShift_next : signed(memoryShift'length-1 downto 0);
+	signal triggerOnRisingEdge_reg, triggerOnRisingEdge_next : std_logic;
+	signal displayDotSamples_reg, displayDotSamples_next : std_logic;
 begin
 
 	CLKREG : process(clk, reset) is
@@ -76,6 +82,8 @@ begin
 			triggerYPos_reg <= TRIGGER_Y_DEFAULT;
 			timebase_reg <= TIMEBASE_DEFAULT;
 			memoryShift_reg <= MEMORY_SHIFT_DEFAULT;
+			triggerOnRisingEdge_reg <= TRIGGER_ON_RISING_EDGE_DEFAULT;
+			displayDotSamples_reg <= DISPLAY_DOT_SAMPLES_DEFAULT;
 		elsif rising_edge(clk) then
 			chAmplitude_reg <= chAmplitude_next;
 			chOffset_reg <= chOffset_next;
@@ -83,11 +91,13 @@ begin
 			triggerYPos_reg <= triggerYPos_next;
 			timebase_reg <= timebase_next;
 			memoryShift_reg <= memoryShift_next;
+			triggerOnRisingEdge_reg <= triggerOnRisingEdge_next;
+			displayDotSamples_reg <= displayDotSamples_next;
 		end if;
 	end process CLKREG;
 
-	NSL : process(debounced_buttons_pressed, debounced_switches, chAmplitude_reg, chOffset_reg,
-				  triggerXPos_reg, triggerYPos_reg, timebase_reg, memoryShift_reg) is
+	NSL : process(debounced_buttons_pressed, debounced_switches, chAmplitude_reg, chOffset_reg, triggerXPos_reg,
+				  triggerYPos_reg, timebase_reg, memoryShift_reg, triggerOnRisingEdge_reg, displayDotSamples_reg) is
 	begin
 		chAmplitude_next <= chAmplitude_reg;
 		chOffset_next <= chOffset_reg;
@@ -168,6 +178,12 @@ begin
 				if debounced_buttons_pressed(0) = '1' then
 					-- Trigger Start / Stop
 					trigger_start <= '1';
+				elsif debounced_buttons_pressed(1) = '1' then
+					-- Trigger on rising or falling edge
+					triggerOnRisingEdge_next <= not triggerOnRisingEdge_reg;
+				elsif debounced_buttons_pressed(2) = '1' then
+					-- Display samples as dots or lines
+					displayDotSamples_next <= not displayDotSamples_reg;
 				end if;
 			when others =>
 				null;
@@ -181,6 +197,8 @@ begin
 	triggerYPos <= triggerYPos_reg;
 	timebase <= timebase_reg;
 	memoryShift <= memoryShift_reg;
+	triggerOnRisingEdge <= triggerOnRisingEdge_reg;
+	displayDotSamples <= displayDotSamples_reg;
 
 	BUTTON_DEBOUNCER : for i in 0 to 3 generate
 		DEBOUNCE_BUTTONS : debouncer

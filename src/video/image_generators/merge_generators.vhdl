@@ -17,6 +17,9 @@ entity merge_generators is
 		--! Display active signal
 		display_active : in std_logic;
 
+		--! Display the current sample if true
+		display_samples : in std_logic;
+
 		--! The current sample
 		currentSample : in unsigned(7 downto 0);
 		--! The previous sample
@@ -29,7 +32,7 @@ entity merge_generators is
 		--! The trigger x position
 		triggerXPos :  unsigned(3 downto 0);
 		--! The trigger y position
-		triggerYPos :  unsigned(4 downto 0);
+		triggerYPos :  unsigned(3 downto 0);
 
 		red		: out std_logic;
 		green	: out std_logic;
@@ -65,7 +68,7 @@ architecture rtl of merge_generators is
 			disp_x : in unsigned(c_HDMI_H_BITWIDTH-1 downto 0);
 			disp_y : in unsigned(c_HDMI_V_BITWIDTH-1 downto 0);
 			triggerXPos :  unsigned(3 downto 0);
-			triggerYPos :  unsigned(4 downto 0);
+			triggerYPos :  unsigned(3 downto 0);
 			chOffset : in unsigned(4 downto 0);
 			trigger_active : out std_logic
 		);
@@ -77,7 +80,8 @@ architecture rtl of merge_generators is
 	signal offset_tr_active	: std_logic;
 begin
 
-	MERGE_PIXELS : process (display_active, grid_active, offset_ch_active, signal_ch_active, offset_tr_active) is
+	MERGE_PIXELS : process (display_active, grid_active, offset_ch_active, 
+							signal_ch_active, offset_tr_active, display_samples) is
 	begin
 		red <= '0';
 		green <= '0';
@@ -91,7 +95,7 @@ begin
 				blue <= '1';
 			end if;
 			-- Render the signal channel in cyan
-			if signal_ch_active = '1' then
+			if signal_ch_active = '1' and display_samples = '1' then
 				red <= '1';
 				blue <= '1';
 			end if;
@@ -101,7 +105,8 @@ begin
 				blue <= '1';
 			end if;
 			-- Render the grid in yellow
-			if grid_active = '1' and offset_ch_active = '0' and signal_ch_active = '0' and offset_tr_active = '0' then
+			if grid_active = '1' and offset_ch_active = '0' and
+			   signal_ch_active = '0' and offset_tr_active = '0' then
 				green <= '1';
 				red <= '1';
 			end if;

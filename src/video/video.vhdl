@@ -18,11 +18,12 @@ entity video is
 
 		currentSample	: in unsigned(7 downto 0);
 		lastSample		: in unsigned(7 downto 0);
+		display_samples : in std_logic;
 
 		chAmplitude		: in signed(2 downto 0);
 		chOffset		: in unsigned(4 downto 0);
 		triggerXPos		:  unsigned(3 downto 0);
-		triggerYPos		:  unsigned(4 downto 0);
+		triggerYPos		:  unsigned(3 downto 0);
 
 		-- Video Signals
 		r,g,b : out std_logic;
@@ -56,12 +57,13 @@ architecture rtl of video is
 			disp_x : in unsigned(c_HDMI_H_BITWIDTH-1 downto 0);
 			disp_y : in unsigned(c_HDMI_V_BITWIDTH-1 downto 0);
 			display_active : in std_logic;
+			display_samples : in std_logic;
 			currentSample : in unsigned(7 downto 0);
 			lastSample : in unsigned(7 downto 0);
 			chAmplitude : in signed(2 downto 0);
 			chOffset : in unsigned(4 downto 0);
 			triggerXPos :  unsigned(3 downto 0);
-			triggerYPos :  unsigned(4 downto 0);
+			triggerYPos :  unsigned(3 downto 0);
 			red : out std_logic;
 			green : out std_logic;
 			blue : out std_logic
@@ -88,6 +90,7 @@ begin
 			disp_x => draw_y,
 			disp_y => draw_x,
 			display_active => draw_active,
+			display_samples => display_samples,
 			currentSample => currentSample,
 			lastSample => lastSample,
 			chAmplitude => chAmplitude,
