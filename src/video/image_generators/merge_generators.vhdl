@@ -70,6 +70,7 @@ architecture rtl of merge_generators is
 			triggerXPos :  unsigned(3 downto 0);
 			triggerYPos :  unsigned(3 downto 0);
 			chOffset : in unsigned(4 downto 0);
+			chAmplitude : in signed(2 downto 0);
 			trigger_active : out std_logic
 		);
 	end component;
@@ -140,6 +141,7 @@ begin
 			triggerXPos => triggerXPos,
 			triggerYPos => triggerYPos,
 			chOffset => chOffset,
+			chAmplitude => chAmplitude,
 			trigger_active => offset_tr_active
 	);
 
