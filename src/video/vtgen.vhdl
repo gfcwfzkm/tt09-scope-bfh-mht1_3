@@ -177,10 +177,13 @@ begin
 		--end if;
 
 		if (disp_x_reg = H_DRAWING_END) then
-			if (disp_y_reg < V_DRAWING_END) then
+			-- End of the line signal, active for a single clock cycle
+			if (disp_y_reg <= V_DRAWING_END) then
 				line_end <= '1';
-			elsif (disp_y_reg <= V_DRAWING_END) then
-				line_end <= '1';
+			end if;
+
+			-- End of the frame signal, active for a single clock cycle
+			if (disp_y_reg = V_DRAWING_END) then
 				frame_end <= '1';
 			end if;
 		end if;

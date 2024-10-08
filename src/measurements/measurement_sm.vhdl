@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-entity meas_statemachine is
+entity measurement_sm is
 	port (
 		clk   : in std_logic;
 		reset : in std_logic;
@@ -12,10 +12,11 @@ entity meas_statemachine is
 		frame_end		: in std_logic;
 		line_end		: in std_logic;
 		triggerXPos		: in unsigned(3 downto 0);
-		triggerYPos		: in unsigned(4 downto 0);
+		triggerYPos		: in unsigned(3 downto 0);
 		timebase		: in unsigned(3 downto 0);
 		memoryShift		: in signed(7 downto 0);
-
+		display_x		: in unsigned(9 downto 0);
+		sampleOnRisingEdge : in std_logic;
 
 		display_samples : out std_logic;
 		current_sample	: out unsigned(7 downto 0);
@@ -30,9 +31,9 @@ entity meas_statemachine is
 		adc_sclk		: out std_logic;
 		adc_miso		: in std_logic
 	);
-end entity meas_statemachine;
+end entity measurement_sm;
 
-architecture rtl of meas_statemachine is
+architecture rtl of measurement_sm is
 	component trigger_detection
 		port (
 			last_sample : in unsigned(7 downto 0);
@@ -77,8 +78,15 @@ architecture rtl of meas_statemachine is
 			fram_miso : in std_logic
 		);
 	end component;
+	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0) := to_unsigned(8, triggerXPos'length);
+	constant DISPLAY_X_MAX : unsigned(display_x'length-1 downto 0) := to_unsigned(480, display_x'length);
+	type state_type is (INIT, WAIT_FOR_LINEEND, READ_FROM_FRAM);
 
+
+	signal sample_address_calced	: unsigned(14 downto 0);
+	signal sample_start_address_reg, sample_start_address_next : unsigned(14 downto 0);
 	signal last_sample_reg, last_sample_next : unsigned(7 downto 0);
+	signal state_reg, state_next : state_type;
 
 	signal adc_busy				: std_logic;
 	signal adc_start			: std_logic;
@@ -93,8 +101,58 @@ architecture rtl of meas_statemachine is
 	signal fram_isThereMoreToWrite	: std_logic;
 	signal sample_from_fram			: unsigned(7 downto 0);
 	signal sample_from_fram_slv		: std_logic_vector(7 downto 0);
+	signal fram_address				: std_logic_vector(14 downto 0);
 begin
 
+	CLKREG : process(clk, reset) is begin
+		if reset = '1' then
+			last_sample_reg <= (others => '0');
+			sample_start_address_reg <= (others => '0');
+			state_reg <= INIT;
+		elsif rising_edge(clk) then
+			last_sample_reg <= last_sample_next;
+			sample_start_address_reg <= sample_start_address_next;
+			state_reg <= state_next;
+		end if;
+	end process CLKREG;
+
+	STATEMACHINE : process (state_reg, last_sample_reg, line_end, fram_isBusy, fram_isThereMoreToWrite) is
+	begin
+		state_next <= state_reg;
+		last_sample_next <= last_sample_reg;
+		fram_readSample <= '0';
+
+		case state_reg is
+			when INIT =>
+				state_next <= WAIT_FOR_LINEEND;
+			when WAIT_FOR_LINEEND =>
+				if line_end = '1' then
+					fram_readSample <= '1';
+					last_sample_next <= sample_from_fram;
+					state_next <= READ_FROM_FRAM;
+				end if;
+			when READ_FROM_FRAM =>
+				if fram_isBusy = '0' then
+					if display_x = DISPLAY_X_MAX then
+						last_sample_next <= sample_from_fram;
+					end if;
+					state_next <= WAIT_FOR_LINEEND;
+				end if;
+		end case;
+	end process STATEMACHINE;
+
+	-- Calculate the address of the sample to be read from the FRAM
+	sample_address_calced <= sample_start_address_reg + resize(display_x, sample_address_calced'length) + to_unsigned(1, sample_address_calced'length)
+							 when display_x < DISPLAY_X_MAX else sample_start_address_reg;
+
+	with state_reg select fram_address <=
+		sample_address_calced when WAIT_FOR_LINEEND,
+		sample_address_calced when READ_FROM_FRAM,
+		(others => '0') when others;
+
+	current_sample <= sample_from_fram;
+	last_sample <= last_sample_reg;
+	
 	sample_from_adc <= unsigned(sample_from_adc_slv);
 	sample_from_fram <= unsigned(sample_from_fram_slv);
 	
@@ -110,7 +168,7 @@ begin
 			close_m_rw_exchange => fram_doneWriting,
 			fram_busy => fram_isBusy,
 			request_m_next_data => fram_isThereMoreToWrite,
-			fram_address => (others => '0'),
+			fram_address => fram_address,
 			data_to_fram => sample_from_adc_slv,
 			data_from_fram => sample_from_fram_slv,
 			fram_cs_n => fram_cs,
@@ -123,7 +181,7 @@ begin
 		port map (
 			clk => clk,
 			reset => reset,
-			start => adc_start,
+			start => '0',
 			busy => adc_busy,
 			data => sample_from_adc_slv,
 			sclk => adc_sclk,
@@ -133,10 +191,10 @@ begin
 
 	TRIGGER : trigger_detection
 		port map (
-			last_sample => last_sample_reg,
-			current_sample => sample_from_adc,
-			trigger_threshold => "10000000",
-			sample_on_rising_edge => '1',
-			triggered => trigger_start
+			last_sample => last_sample_reg(7 downto 4),
+			current_sample => sample_from_adc(7 downto 4),
+			trigger_threshold => triggerYPos,
+			sample_on_rising_edge => sampleOnRisingEdge,
+			triggered => open
 	);
 end architecture;

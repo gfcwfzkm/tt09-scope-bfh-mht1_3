@@ -5,9 +5,9 @@ use ieee.math_real.all;
 
 entity trigger_detection is
 	port (
-		last_sample				: in unsigned(7 downto 0);
-		current_sample			: in unsigned(7 downto 0);
-		trigger_threshold		: in unsigned(4 downto 0);
+		last_sample				: in unsigned(3 downto 0);
+		current_sample			: in unsigned(3 downto 0);
+		trigger_threshold		: in unsigned(3 downto 0);
 		
 		sample_on_rising_edge	: in std_logic;
 

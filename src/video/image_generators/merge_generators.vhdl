@@ -24,6 +24,9 @@ entity merge_generators is
 		currentSample : in unsigned(7 downto 0);
 		--! The previous sample
 		lastSample : in unsigned(7 downto 0);
+		
+		--! Display the current sample as a dot or line
+		displayDotSamples : in std_logic;
 
 		--! The amplitude of the channel
 		chAmplitude : in signed(2 downto 0);
@@ -125,7 +128,7 @@ begin
 		port map (
 			disp_x => disp_x,
 			disp_y => disp_y,
-			ShowDotInsteadOfLine => '1',
+			ShowDotInsteadOfLine => displayDotSamples,
 			currentSample => currentSample,
 			lastSample => lastSample,
 			chAmplitude => chAmplitude,

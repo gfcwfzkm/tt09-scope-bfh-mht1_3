@@ -25,10 +25,12 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			currentSample : in unsigned(7 downto 0);
 			lastSample : in unsigned(7 downto 0);
 			display_samples : in std_logic;
+			displayDotSamples	: in std_logic;
 			chAmplitude : in signed(2 downto 0);
 			chOffset : in unsigned(4 downto 0);
 			triggerXPos :  unsigned(3 downto 0);
 			triggerYPos :  unsigned(3 downto 0);
+			display_x : in unsigned(9 downto 0);
 		  	r : out std_logic;
 		  	g : out std_logic;
 		  	b : out std_logic;
@@ -57,6 +59,32 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 		);
 	end component;
 
+	component measurement_sm
+		port (
+			clk : in std_logic;
+			reset : in std_logic;
+			trigger_start : in std_logic;
+			frame_end : in std_logic;
+			line_end : in std_logic;
+			triggerXPos : in unsigned(3 downto 0);
+			triggerYPos : in unsigned(3 downto 0);
+			timebase : in unsigned(3 downto 0);
+			memoryShift : in signed(7 downto 0);
+			display_x : in unsigned(9 downto 0);
+			sampleOnRisingEdge : in std_logic;
+			display_samples : out std_logic;
+			current_sample : out unsigned(7 downto 0);
+			last_sample : out unsigned(7 downto 0);
+			fram_cs : out std_logic;
+			fram_sclk : out std_logic;
+			fram_mosi : out std_logic;
+			fram_miso : in std_logic;
+			adc_cs : out std_logic;
+			adc_sclk : out std_logic;
+			adc_miso : in std_logic
+		);
+	end component;
+
 	signal reset          : std_logic;
 	signal display_samples : std_logic;
 	signal frame_end	  : std_logic;
@@ -71,6 +99,11 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 	signal memoryShift	  : signed(7 downto 0);
 	signal triggerOnRisingEdge : std_logic;
 	signal displayDotSamples : std_logic;
+
+	signal display_x : unsigned(9 downto 0);
+
+	signal currentSample : unsigned(7 downto 0);
+	signal lastSample	: unsigned(7 downto 0);
 begin
 
 	-- Make the reset active-high
@@ -86,13 +119,15 @@ begin
 		reset		=> reset,
 		line_end	=> line_end,
 		frame_end	=> frame_end,
-		currentSample => to_unsigned(120, 8),
-		lastSample	=> to_unsigned(120, 8),
+		currentSample => currentSample,
+		lastSample	=> lastSample,
 		display_samples => display_samples,
+		displayDotSamples => displayDotSamples,
 		chAmplitude	=> chAmplitude,
 		chOffset	=> chOffset,
 		triggerXPos	=> triggerXPos,
 		triggerYPos	=> triggerYPos,
+		display_x	=> display_x,
 		r			=> uo_out(4),
 		g			=> uo_out(0),
 		b			=> uo_out(5),
@@ -119,6 +154,32 @@ begin
 		triggerYPos	=> triggerYPos,
 		timebase	=> timebase,
 		memoryShift	=> memoryShift
+	);
+
+	-- Measurement State Machine Entity, attached to the ADC and FRAM
+	MEASUREMENTS : measurement_sm
+	port map (
+		clk			=> clk,
+		reset		=> reset,
+		trigger_start => trigger_start,
+		frame_end	=> frame_end,
+		line_end	=> line_end,
+		triggerXPos	=> triggerXPos,
+		triggerYPos	=> triggerYPos,
+		timebase	=> timebase,
+		memoryShift	=> memoryShift,
+		display_x	=> display_x,
+		sampleOnRisingEdge => triggerOnRisingEdge,
+		display_samples => display_samples,
+		current_sample => currentSample,
+		last_sample	=> lastSample,
+		fram_cs		=> uio_out(2),
+		fram_sclk	=> uio_out(0),
+		fram_mosi	=> uio_out(1),
+		fram_miso	=> ui_in(6),
+		adc_cs		=> uio_out(4),
+		adc_sclk	=> uio_out(3),
+		adc_miso	=> ui_in(7)
 	);
 
 end Behavioral;
