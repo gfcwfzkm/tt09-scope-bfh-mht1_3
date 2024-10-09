@@ -55,7 +55,6 @@ begin
 		shift_next <= shift_reg;
 		cnt_next <= cnt_reg;
 		sclk_next <= sclk_reg;
-		data <= shift_reg;
 		
 		case state_reg is
 			when IDLE =>
