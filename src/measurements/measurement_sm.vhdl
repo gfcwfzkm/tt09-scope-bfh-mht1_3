@@ -1,3 +1,15 @@
+-- TerosHDL Documentation:
+--! @title Measurement State Machine
+--! @author Pascal Gesell (gesep1 / gfcwfzkm)
+--! @version 1.0
+--! @date 09.10.2024
+--! @brief State machine to control the measurement process.
+--!
+--! This module controls the measurement process of the oscilloscope. 
+--! It reads the samples from the ADC and writes them to the FRAM when a single-shot measurement is triggered.
+--! Otherwise the samples are read from the FRAM and displayed on the screen.
+--!
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -5,30 +17,51 @@ use ieee.math_real.all;
 
 entity measurement_sm is
 	port (
+		--! Clock signal
 		clk   : in std_logic;
+		--! Ansynchronous, active-high reset
 		reset : in std_logic;
 		
+		--! Trigger signal to start the measurement process
 		trigger_start	: in std_logic;
+		--! Image frame end signal
 		frame_end		: in std_logic;
+		--! Image line end signal
 		line_end		: in std_logic;
+		--! Trigger X position, multiplied by 32 if applied onto the screen / sample
 		triggerXPos		: in unsigned(3 downto 0);
+		--! Trigger Y position, multiplied by 16 if applied onto the screen / sample
 		triggerYPos		: in unsigned(3 downto 0);
+		--! Timebase of the oscilloscope
 		timebase		: in unsigned(2 downto 0);
+		--! Shift of the memory to display the samples
 		memoryShift		: in signed(7 downto 0);
+		--! Current display position in the horizontal direction
 		display_x		: in unsigned(9 downto 0);
-		sampleOnRisingEdge : in std_logic;
+		--! Trigger on the rising or falling edge of the signal
+		triggerOnRisingEdge : in std_logic;
 
+		--! Signal to toggle if the samples should be displayed
 		display_samples : out std_logic;
+		--! Current sample to be displayed
 		current_sample	: out unsigned(7 downto 0);
+		--! Last sample to be displayed
 		last_sample		: out unsigned(7 downto 0);
 
+		--! FRAM Chip Select
 		fram_cs			: out std_logic;
+		--! FRAM Serial Clock
 		fram_sclk		: out std_logic;
+		--! FRAM Master Out Slave In
 		fram_mosi		: out std_logic;
+		--! FRAM Master In Slave Out
 		fram_miso		: in std_logic;
 
+		--! ADC Chip Select
 		adc_cs			: out std_logic;
+		--! ADC Serial Clock
 		adc_sclk		: out std_logic;
+		--! ADC Master In Slave Out
 		adc_miso		: in std_logic
 	);
 end entity measurement_sm;
@@ -78,32 +111,60 @@ architecture rtl of measurement_sm is
 			fram_miso : in std_logic
 		);
 	end component;
-	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0) := to_unsigned(8, triggerXPos'length);
-	constant DISPLAY_X_MAX : unsigned(display_x'length-1 downto 0) := to_unsigned(480, display_x'length);
-	type state_type is (INIT, WAIT_FOR_LINEEND, READ_FROM_FRAM);
 
+	--! Default trigger X position
+	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0) := to_unsigned(8, triggerXPos'length);
+	--! Display X maximum value
+	constant DISPLAY_X_MAX : unsigned(display_x'length-1 downto 0) := to_unsigned(480, display_x'length);
+
+	--! State machine states
+	type state_type is (
+		INIT,				--! Initialization state
+		WAIT_FOR_LINEEND,	--! Wait for the end of the line
+		READ_FROM_FRAM		--! Read samples from the FRAM to display them
+	);
+
+	--! Calculated display X position (display_x << timebase + 1 << timebase)
 	signal display_x_calced			: unsigned(14 downto 0);
+	--! Calculated sample address (sample_start_address + display_x_calced)
 	signal sample_address_calced	: unsigned(14 downto 0);
+	--! Current start address of the samples in the FRAM
 	signal sample_start_address_reg, sample_start_address_next : unsigned(14 downto 0);
+	--! Last read sample from the FRAM
 	signal last_sample_reg, last_sample_next : unsigned(7 downto 0);
+	--! Current state of the state machine
 	signal state_reg, state_next : state_type;
 
-	signal adc_busy				: std_logic;
+	--! ADC Busy signal (1 = busy)
+	signal adc_isBusy				: std_logic;
+	--! ADC Start signal (1 = start)
 	signal adc_start			: std_logic;
+	--! Sample from the ADC (unsigned)
 	signal sample_from_adc		: unsigned(7 downto 0);
+	--! Sample from the ADC (std_logic_vector)
 	signal sample_from_adc_slv	: std_logic_vector(7 downto 0);
 
+	--! FRAM Busy signal (1 = busy)
 	signal fram_isBusy				: std_logic;
+	--! FRAM Read single byte signal (1 = read)
 	signal fram_readSample			: std_logic;
+	--! FRAM Write multiple samples signal (1 = write)
 	signal fram_writeSamples		: std_logic;
+	--! FRAM Write next sample signal (1 = write)
 	signal fram_writeNextSample		: std_logic;
+	--! FRAM Done writing signal (1 = done)
 	signal fram_doneWriting			: std_logic;
+	--! FRAM requesting more data to write, or done/cancelation of the write (1 = more to write)
 	signal fram_isThereMoreToWrite	: std_logic;
+	--! Sample from the FRAM (unsigned)
 	signal sample_from_fram			: unsigned(7 downto 0);
+	--! Sample from the FRAM (std_logic_vector)
 	signal sample_from_fram_slv		: std_logic_vector(7 downto 0);
+	--! FRAM Address to read/write from/to
 	signal fram_address				: std_logic_vector(14 downto 0);
 begin
 
+	--! Register process and reset logic
 	CLKREG : process(clk, reset) is begin
 		if reset = '1' then
 			last_sample_reg <= (others => '0');
@@ -116,6 +177,7 @@ begin
 		end if;
 	end process CLKREG;
 
+	--! State machine process
 	STATEMACHINE : process (state_reg, last_sample_reg, line_end, sample_from_fram, sample_start_address_reg, fram_isBusy, fram_isThereMoreToWrite, display_x) is
 	begin
 		state_next <= state_reg;
@@ -164,6 +226,7 @@ begin
 	sample_from_adc <= unsigned(sample_from_adc_slv);
 	sample_from_fram <= unsigned(sample_from_fram_slv);
 	
+	--! FRAM Component with 2^15 bytes of storage
 	SAMPLES_STORAGE : fram 
 		port map (
 			clk => clk,
@@ -185,24 +248,26 @@ begin
 			fram_miso => fram_miso
 	);
 
+	--! ADC Component with 8-bit resolution
 	SAMPLES_ADC : pmodAD1
 		port map (
 			clk => clk,
 			reset => reset,
 			start => '0',
-			busy => adc_busy,
+			busy => adc_isBusy,
 			data => sample_from_adc_slv,
 			sclk => adc_sclk,
 			miso => adc_miso,
 			cs_n => adc_cs
 	);
 
+	--! Trigger Detection Component
 	TRIGGER : trigger_detection
 		port map (
 			last_sample => last_sample_reg(7 downto 4),
 			current_sample => sample_from_adc(7 downto 4),
 			trigger_threshold => triggerYPos,
-			sample_on_rising_edge => sampleOnRisingEdge,
+			sample_on_rising_edge => triggerOnRisingEdge,
 			triggered => open
 	);
 end architecture;

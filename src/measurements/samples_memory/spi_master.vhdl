@@ -1,3 +1,16 @@
+-- TerosHDL Documentation:
+--! @title SPI Master
+--! @author Pascal Gesell (gesep1 / gfcwfzkm)
+--! @version 1.0
+--! @date 09.10.2024
+--! @brief SPI Master module for a simple SPI communication.
+--!
+--! This module implements a simple SPI master module that can be used to communicate with SPI slave devices.
+--! The module supports the following features:
+--! - Configurable bit order (MSB or LSB first)
+--! - Configurable number of bits per transfer
+--!
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -5,7 +18,9 @@ use ieee.math_real.all;
 
 entity spi_master is
 	generic (
+		--! Bit order (MSB or LSB first)
 		MSB_FIRST : boolean := TRUE;
+		--! Number of bits per transfer
 		NBITS : positive := 8
 	);
 	port (
@@ -39,15 +54,23 @@ entity spi_master is
 end entity spi_master;
 
 architecture rtl of spi_master is
-	type spi_state is (IDLE, TRANSCEIVE, DONE);
+	--! SPI state machine states
+	type spi_state is (
+		IDLE,		--! Idle state
+		TRANSCEIVE,	--! Transceive state
+		DONE		--! Done state
+	);
+
+	--! State register and next state
 	signal state_reg, state_next : spi_state;
 
 	--! Reverse bit order if MSB_FIRST is set
-	signal data_in_MSB : std_logic_vector(NBITS-1 downto 0);
-	signal data_out_MSB : std_logic_vector(NBITS-1 downto 0);
+	signal data_in_MSB, data_out_MSB : std_logic_vector(NBITS-1 downto 0);
 
 	--! Shift register and shift cycle counter
 	signal shift_cycle_reg, shift_cycle_next : unsigned(3 downto 0);
+
+	--! Shift register and next shift register
 	signal shift_reg, shift_next : std_logic_vector(NBITS downto 0);
 begin
 

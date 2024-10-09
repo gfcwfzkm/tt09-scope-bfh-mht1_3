@@ -1,3 +1,16 @@
+-- TerosHDL Documentation:
+--! @title FRAM Controller
+--! @author Pascal Gesell (gesep1 / gfcwfzkm)
+--! @version 1.0
+--! @date 09.10.2024
+--! @brief Controls the FRAM memory
+--!
+--! This module controls the FRAM memory. It reads and writes data to the FRAM memory using the SPI protocol.
+--! The module can handle single read/write transactions and multiple read/write transactions. The module
+--! uses a state machine to control the SPI transactions and the FRAM memory. It has been specifically
+--! written for the FM25W256 FRAM memory chip by Cypress (Infineon): https://datasheet.octopart.com/FM25W256-G-Cypress-Semiconductor-datasheet-86779777.pdf
+--!
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -5,55 +18,99 @@ use ieee.math_real.all;
 
 entity fram is
 	generic(
-		F_CLK : positive := 25_000_000 --! FPGA clock frequency in Hz
+		F_CLK : positive := 25_000_000 --! FPGA clock frequency in Hz, used to calculate the FRAM deselect time
 	);
 	port (
-		-- Clock and reset signals
+		--! Clock signal
 		clk   : in std_logic;
+		--! Ansynchronous, active-high reset
 		reset : in std_logic;
 		
-		-- FRAM control signals
+		--! Start a single read transaction
 		start_read_single		: in std_logic;
+		--! Start a single write transaction
 		start_write_single		: in std_logic;
+		--! Start a multiple read transaction
 		start_read_multiple		: in std_logic;
+		--! Start a multiple write transaction
 		start_write_multiple	: in std_logic;
+		--! Start another multiple read/write transaction if request_m_next_data is high
 		another_m_rw_exchange	: in std_logic;
+		--! Close the multiple read/write transaction if close_m_rw_exchange is high
 		close_m_rw_exchange		: in std_logic;
+		--! FRAM busy signal (active-high)
 		fram_busy				: out std_logic;
+		--! Request the next data for a multiple read/write transaction
 		request_m_next_data		: out std_logic;
 
-		-- FRAM data signals
+		--! FRAM address to read/write
 		fram_address	: in std_logic_vector(14 downto 0);
+		--! Data to write to the FRAM
 		data_to_fram	: in std_logic_vector(7 downto 0);
+		--! Data read from the FRAM
 		data_from_fram	: out std_logic_vector(7 downto 0);
 
-		-- FRAM SPI signals
+		--! FRAM Chip Select (active-low)
 		fram_cs_n	: out std_logic;
+		--! FRAM Serial Clock
 		fram_sck	: out std_logic;
+		--! FRAM Master Out Slave In
 		fram_mosi	: out std_logic;
+		--! FRAM Master In Slave Out
 		fram_miso	: in std_logic
 	);
 end entity fram;
 
 architecture rtl of fram is
-	constant FRAM_DESELECT_TIME : positive := integer(1.0 / real(60 * 10.0**(-9)));	--! 60ns deselect time for the FRAM
+	--! 60ns deselect time for the FRAM memory
+	constant FRAM_DESELECT_TIME : positive := integer(1.0 / real(60 * 10.0**(-9)));	
+	--! Counter value to deselect the FRAM memory based on the deselect time and the FPGA clock frequency
 	constant FRAM_DESELECT_COUNTER : positive := integer(F_CLK / FRAM_DESELECT_TIME);
+	--! FRAM SPI Read Opcode
 	constant FRAM_OPCODE_READ	: std_logic_vector(7 downto 0) := "00000011";
+	--! FRAM SPI Write Opcode
 	constant FRAM_OPCODE_WRITE	: std_logic_vector(7 downto 0) := "00000010";
+	--! FRAM SPI Write Enable Opcode
 	constant FRAM_OPCODE_WREN	: std_logic_vector(7 downto 0) := "00000110";
 
-	type fram_state is (IDLE, SEND_WREN_OPCODE, RESTART_SPI, SEND_ADDR_H, SEND_ADDR_L, SEND_DATA,
-						READ_DATA, WAIT_MULTIPLE_RW, FINISH, FINISH_MULTIPLE_RW);
-	type transaction_state is (SINGLE_READ, SINGLE_WRITE, MULTIPLE_READ, MULTIPLE_WRITE);
+	--! State machine states
+	type fram_state is (
+		IDLE,				--! Idle state, waiting for a transaction to start
+		SEND_WREN_OPCODE,	--! Send the write enable opcode to the FRAM
+		RESTART_SPI,		--! Restart the SPI transaction after a write enable opcode
+		SEND_ADDR_H,		--! Send the high byte of the address to the FRAM
+		SEND_ADDR_L,		--! Send the low byte of the address to the FRAM
+		SEND_DATA,			--! Send the data to be written to the FRAM
+		READ_DATA,			--! Read the data from the FRAM
+		WAIT_MULTIPLE_RW,	--! Wait for the next multiple read/write transaction
+		FINISH,				--! Finish the current single-byte transaction
+		FINISH_MULTIPLE_RW	--! Finish the current multiple read/write transaction
+	);
 
+	--! Transaction states
+	type transaction_state is (
+		SINGLE_READ,	--! Single read transaction
+		SINGLE_WRITE,	--! Single write transaction
+		MULTIPLE_READ,	--! Multiple read transaction
+		MULTIPLE_WRITE	--! Multiple write transaction
+	);
+
+	--! State machine register
 	signal state_reg, state_next : fram_state;
+	--! Transaction state register
 	signal transaction_state_reg, transaction_state_next : transaction_state;
+	--! Deselect counter register
 	signal nCS_counter_reg, nCS_counter_next : unsigned(integer(ceil(log2(real(FRAM_DESELECT_COUNTER)))) downto 0) := (others => '0');
 
+	--! SPI busy signal
 	signal spi_busy : std_logic := '0';
+	--! SPI multiple read/write signal
 	signal spi_multiple_rw : std_logic := '0';
+	--! SPI start signal
 	signal spi_start : std_logic := '0';
+	--! SPI data to be sent to the FRAM
 	signal spi_data_to_fram : std_logic_vector(7 downto 0) := (others => '0');
+	--! SPI data received from the FRAM
 	signal spi_data_from_fram : std_logic_vector(7 downto 0) := (others => '0');
 
 	component spi_master
@@ -88,6 +145,7 @@ begin
 		'1' when FINISH_MULTIPLE_RW,
 		'0' when others;
 
+	--! Clocked registers and reset logic
 	CLKREG : process(clk, reset) is begin
 		if reset = '1' then
 			state_reg <= IDLE;
@@ -100,6 +158,7 @@ begin
 		end if;
 	end process CLKREG;
 
+	--! State machine process
 	STATEMACHINE : process (state_reg, transaction_state_reg, start_read_single, start_write_single,
 							start_read_multiple, start_write_multiple, another_m_rw_exchange, spi_busy,
 							close_m_rw_exchange, nCS_counter_reg, fram_address, data_to_fram) is
@@ -267,7 +326,7 @@ begin
 		end case;
 	end process STATEMACHINE;
 
-	-- Instantiate the SPI master
+	--! SPI Master Component
 	spi_master_inst : spi_master
   		port map (
     		clk			=> clk,

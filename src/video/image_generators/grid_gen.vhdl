@@ -1,3 +1,13 @@
+-- TerosHDL Documentation:
+--! @title Grid Generator
+--! @author Pascal Gesell (gesep1 / gfcwfzkm)
+--! @version 1.0
+--! @date 09.10.2024
+--! @brief Generates a grid on the display.
+--!
+--! This module generates a grid on the display. The grid is generated based on the display position
+--! and the grid size, resulting in a grid that is displayed on the screen.
+--!
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -5,11 +15,17 @@ use ieee.numeric_std.all;
 
 entity Grid_Gen is
 	generic (
+		--! HDMI Horizontal Bitwidth
 		c_HDMI_H_BITWIDTH	: positive := 10;
+		--! HDMI Vertical Bitwidth
 		c_HDMI_V_BITWIDTH	: positive := 10;
+		--! Scope Grid Horizontal
 		c_SCOPE_GRID_H		: positive := 60;
+		--! Scope Grid Vertical
 		c_SCOPE_GRID_V		: positive := 64;
+		--! HDMI Horizontal Visible
 		c_HDMI_H_VISIBLE	: positive := 480;
+		--! HDMI Vertical Visible
 		c_HDMI_V_VISIBLE	: positive := 640
 	);
 	port (
@@ -24,6 +40,7 @@ end entity;
 
 architecture rtl of Grid_Gen is
 begin
+	--! Generate the grid
 	process (disp_x, disp_y)
 	begin
 		-- Generate a grid that results in 10 x 10 board

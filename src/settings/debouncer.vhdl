@@ -1,3 +1,16 @@
+-- TerosHDL Documentation:
+--! @title Debouncer
+--! @author Pascal Gesell (gesep1 / gfcwfzkm)
+--! @version 1.0
+--! @date 09.10.2024
+--! @brief Debounces an input signal.
+--!
+--! This module debounces an input signal. 
+--! The input signal is considered stable if it has been in the same state for a certain number of clock cycles.
+--! The number of clock cycles can be configured using the DEBOUNCE_COUNTER_MAX generic.
+--! The debouncing logic is only executed if the deb_en signal is high, allowing the debouncing circuit to be synchronized to certain pulses.
+--!
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -34,12 +47,15 @@ architecture rtl of debouncer is
 
 	--! Debouncer Counter
 	signal counter_reg, counter_next : unsigned(COUNTER_WIDTH-1 downto 0);
+
+	--! Debounced Output Register
 	signal output_reg, output_next : std_logic;
 begin
 
 	--! Output Register Logic
 	debounced <= output_reg;
 
+	--! Clock and Reset Logic
 	CLKREG : process(clk, reset) is
 	begin
 		if reset = '1' then

@@ -1,3 +1,14 @@
+-- TerosHDL Documentation:
+--! @title Merge Generators
+--! @author Pascal Gesell (gesep1 / gfcwfzkm)
+--! @version 1.0
+--! @date 09.10.2024
+--! @brief Merges the different image generators into one image.
+--!
+--! This module merges the different image generators into one image. The different image generators
+--! are the grid generator, the channel generator, and the trigger generator.
+--!
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -5,41 +16,42 @@ use ieee.math_real.all;
 
 entity merge_generators is
 	generic (
+		--! HDMI Horizontal Bitwidth
 		c_HDMI_H_BITWIDTH	: positive := 10;
+		--! HDMI Vertical Bitwidth
 		c_HDMI_V_BITWIDTH	: positive := 10
 	);
 	port (
 		--! X Position of Display
-		disp_x		: in unsigned(c_HDMI_H_BITWIDTH-1 downto 0);
+		disp_x				: in unsigned(c_HDMI_H_BITWIDTH-1 downto 0);
 		--! Y Position of Display
-		disp_y		: in unsigned(c_HDMI_V_BITWIDTH-1 downto 0);
+		disp_y				: in unsigned(c_HDMI_V_BITWIDTH-1 downto 0);
 
 		--! Display active signal
-		display_active : in std_logic;
+		display_active		: in std_logic;
 
 		--! Display the current sample if true
-		display_samples : in std_logic;
+		display_samples		: in std_logic;
 
 		--! The current sample
-		currentSample : in unsigned(7 downto 0);
+		currentSample		: in unsigned(7 downto 0);
 		--! The previous sample
-		lastSample : in unsigned(7 downto 0);
+		lastSample			: in unsigned(7 downto 0);
 		
 		--! Display the current sample as a dot or line
-		displayDotSamples : in std_logic;
+		displayDotSamples	: in std_logic;
 
 		--! The amplitude of the channel
-		chAmplitude : in signed(2 downto 0);
+		chAmplitude			: in signed(2 downto 0);
 		--! The offset of the channel
-		chOffset : in unsigned(4 downto 0);
+		chOffset			: in unsigned(4 downto 0);
 		--! The trigger x position
-		triggerXPos :  unsigned(3 downto 0);
+		triggerXPos			: in unsigned(3 downto 0);
 		--! The trigger y position
-		triggerYPos :  unsigned(3 downto 0);
+		triggerYPos			: in unsigned(3 downto 0);
 
-		red		: out std_logic;
-		green	: out std_logic;
-		blue	: out std_logic
+		--! RGB signals
+		red, green, blue : out std_logic
 	);
 end entity merge_generators;
 
@@ -78,15 +90,21 @@ architecture rtl of merge_generators is
 		);
 	end component;
 
+	--! Active signal for the grid
 	signal grid_active		: std_logic;
+	--! Active signal for the channel offset
 	signal offset_ch_active	: std_logic;
+	--! Active signal for the signal channel
 	signal signal_ch_gen	: std_logic;
+	--! Active signal for the trigger offset
 	signal offset_tr_active	: std_logic;
+	--! Active signal for the signal channel
 	signal signal_ch_active	: std_logic;
 begin
 
 	signal_ch_active <= '1' when signal_ch_gen = '1' and display_samples = '1' else '0';
 
+	--! Merge the pixels
 	MERGE_PIXELS : process (display_active, grid_active, offset_ch_active, 
 							signal_ch_active, offset_tr_active, display_samples) is
 	begin
@@ -120,6 +138,7 @@ begin
 		end if;
 	end process MERGE_PIXELS;
 
+	--! Generate the grid
 	Grid_Generator : Grid_Gen
 		port map (
 			disp_x => disp_x,
@@ -127,6 +146,7 @@ begin
 			grid_active => grid_active
 	);
 
+	--! Generate the channel samples and offset
 	Channel_Generator : channel_gen
 		port map (
 			disp_x => disp_x,
@@ -140,6 +160,7 @@ begin
 			offset => offset_ch_active
 	);
 
+	--! Generate the trigger offset
 	Trigger_Generator : trigger_gen
 		port map (
 			disp_x => disp_x,

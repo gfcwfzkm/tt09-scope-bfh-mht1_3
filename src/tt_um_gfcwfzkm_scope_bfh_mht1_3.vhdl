@@ -1,3 +1,13 @@
+-- TerosHDL Documentation:
+--! @title Oscilloscope Top Module
+--! @author Pascal Gesell (gesep1 / gfcwfzkm)
+--! @version 1.0
+--! @date 09.10.2024
+--! @brief Top module for the oscilloscope.
+--!
+--! Tiny Tapeout Oscilloscope Top Module
+--!
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -71,7 +81,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			timebase : in unsigned(2 downto 0);
 			memoryShift : in signed(7 downto 0);
 			display_x : in unsigned(9 downto 0);
-			sampleOnRisingEdge : in std_logic;
+			triggerOnRisingEdge : in std_logic;
 			display_samples : out std_logic;
 			current_sample : out unsigned(7 downto 0);
 			last_sample : out unsigned(7 downto 0);
@@ -169,7 +179,7 @@ begin
 			timebase	=> timebase,
 			memoryShift	=> memoryShift,
 			display_x	=> display_x,
-			sampleOnRisingEdge => triggerOnRisingEdge,
+			triggerOnRisingEdge => triggerOnRisingEdge,
 			display_samples => display_samples,
 			current_sample => currentSample,
 			last_sample	=> lastSample,
