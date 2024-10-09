@@ -1,0 +1,79 @@
+//Copyright (C)2014-2024 Gowin Semiconductor Corporation.
+//All rights reserved. 
+//File Title: Physical Constraints file
+//Tool Version: V1.9.10.02
+//Part Number: GW1NR-LV9QN88PC6/I5
+//Device: GW1NR-9
+//Device Version: C
+//Created Time: Wed 10 09 10:50:18 2024
+
+IO_LOC "pmod_hdmi_de" 53;
+IO_PORT "pmod_hdmi_de" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_hdmi_vsync" 51;
+IO_PORT "pmod_hdmi_vsync" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "pmod_hdmi_hsync" 35;
+IO_PORT "pmod_hdmi_hsync" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_hdmi_clk" 41;
+IO_PORT "pmod_hdmi_clk" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_hdmi_blue" 54;
+IO_PORT "pmod_hdmi_blue" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_hdmi_red" 55;
+IO_PORT "pmod_hdmi_red" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_hdmi_green" 42;
+IO_PORT "pmod_hdmi_green" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_fram_mosi" 56;
+IO_PORT "pmod_fram_mosi" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_fram_sck" 57;
+IO_PORT "pmod_fram_sck" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_fram_cs" 32;
+IO_PORT "pmod_fram_cs" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_da2_mosi2" 30;
+IO_PORT "pmod_da2_mosi2" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_da2_mosi1" 33;
+IO_PORT "pmod_da2_mosi1" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_da2_sck" 29;
+IO_PORT "pmod_da2_sck" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_da2_cs" 34;
+IO_PORT "pmod_da2_cs" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_ad1_sck" 25;
+IO_PORT "pmod_ad1_sck" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_ad1_cs" 28;
+IO_PORT "pmod_ad1_cs" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "on_board_leds[5]" 16;
+IO_PORT "on_board_leds[5]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "on_board_leds[4]" 15;
+IO_PORT "on_board_leds[4]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "on_board_leds[3]" 14;
+IO_PORT "on_board_leds[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "on_board_leds[2]" 13;
+IO_PORT "on_board_leds[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "on_board_leds[1]" 11;
+IO_PORT "on_board_leds[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "on_board_leds[0]" 10;
+IO_PORT "on_board_leds[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "pmod_fram_miso" 31;
+IO_PORT "pmod_fram_miso" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_switches[1]" 48;
+IO_PORT "pmod_switches[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_switches[0]" 49;
+IO_PORT "pmod_switches[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_buttons[3]" 38;
+IO_PORT "pmod_buttons[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_buttons[2]" 37;
+IO_PORT "pmod_buttons[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_buttons[1]" 36;
+IO_PORT "pmod_buttons[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_buttons[0]" 39;
+IO_PORT "pmod_buttons[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "BTN_S1" 4;
+IO_PORT "BTN_S1" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "clk_27MHz" 52;
+IO_PORT "clk_27MHz" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "BTN_S2" 3;
+IO_PORT "BTN_S2" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_switches[2]" 76;
+IO_PORT "pmod_switches[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_ad1_miso1" 27;
+IO_PORT "pmod_ad1_miso1" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
+IO_LOC "pmod_switches[3]" 77;
+IO_PORT "pmod_switches[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;

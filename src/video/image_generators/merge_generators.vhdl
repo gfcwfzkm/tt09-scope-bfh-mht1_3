@@ -80,9 +80,12 @@ architecture rtl of merge_generators is
 
 	signal grid_active		: std_logic;
 	signal offset_ch_active	: std_logic;
-	signal signal_ch_active	: std_logic;
+	signal signal_ch_gen	: std_logic;
 	signal offset_tr_active	: std_logic;
+	signal signal_ch_active	: std_logic;
 begin
+
+	signal_ch_active <= '1' when signal_ch_gen = '1' and display_samples = '1' else '0';
 
 	MERGE_PIXELS : process (display_active, grid_active, offset_ch_active, 
 							signal_ch_active, offset_tr_active, display_samples) is
@@ -99,7 +102,7 @@ begin
 				blue <= '1';
 			end if;
 			-- Render the signal channel in cyan
-			if signal_ch_active = '1' and display_samples = '1' then
+			if signal_ch_active = '1' then
 				red <= '1';
 				blue <= '1';
 			end if;
@@ -133,7 +136,7 @@ begin
 			lastSample => lastSample,
 			chAmplitude => chAmplitude,
 			chOffset => chOffset,
-			channel => signal_ch_active,
+			channel => signal_ch_gen,
 			offset => offset_ch_active
 	);
 

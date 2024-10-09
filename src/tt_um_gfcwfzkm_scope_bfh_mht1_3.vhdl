@@ -28,9 +28,9 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			displayDotSamples	: in std_logic;
 			chAmplitude : in signed(2 downto 0);
 			chOffset : in unsigned(4 downto 0);
-			triggerXPos :  unsigned(3 downto 0);
-			triggerYPos :  unsigned(3 downto 0);
-			display_x : in unsigned(9 downto 0);
+			triggerXPos : in unsigned(3 downto 0);
+			triggerYPos : in unsigned(3 downto 0);
+			display_x : out unsigned(9 downto 0);
 		  	r : out std_logic;
 		  	g : out std_logic;
 		  	b : out std_logic;
@@ -54,7 +54,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			chOffset : out unsigned(4 downto 0);
 			triggerXPos : out unsigned(3 downto 0);
 			triggerYPos : out unsigned(3 downto 0);
-			timebase : out unsigned(3 downto 0);
+			timebase : out unsigned(2 downto 0);
 			memoryShift : out signed(7 downto 0)
 		);
 	end component;
@@ -68,7 +68,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			line_end : in std_logic;
 			triggerXPos : in unsigned(3 downto 0);
 			triggerYPos : in unsigned(3 downto 0);
-			timebase : in unsigned(3 downto 0);
+			timebase : in unsigned(2 downto 0);
 			memoryShift : in signed(7 downto 0);
 			display_x : in unsigned(9 downto 0);
 			sampleOnRisingEdge : in std_logic;
@@ -95,7 +95,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 	signal chOffset		  : unsigned(4 downto 0);
 	signal triggerXPos	  : unsigned(3 downto 0);
 	signal triggerYPos	  : unsigned(3 downto 0);
-	signal timebase		  : unsigned(3 downto 0);
+	signal timebase		  : unsigned(2 downto 0);
 	signal memoryShift	  : signed(7 downto 0);
 	signal triggerOnRisingEdge : std_logic;
 	signal displayDotSamples : std_logic;
@@ -114,72 +114,72 @@ begin
 	
 	-- Video Generator Entity, attached to a 1bpp HDMI Pmod
 	VIDEOGEN : video
-	port map (
-		clk			=> clk,
-		reset		=> reset,
-		line_end	=> line_end,
-		frame_end	=> frame_end,
-		currentSample => currentSample,
-		lastSample	=> lastSample,
-		display_samples => display_samples,
-		displayDotSamples => displayDotSamples,
-		chAmplitude	=> chAmplitude,
-		chOffset	=> chOffset,
-		triggerXPos	=> triggerXPos,
-		triggerYPos	=> triggerYPos,
-		display_x	=> display_x,
-		r			=> uo_out(4),
-		g			=> uo_out(0),
-		b			=> uo_out(5),
-		hsync		=> uo_out(2),
-		vsync		=> uo_out(7),
-		de			=> uo_out(6)
+		port map (
+			clk			=> clk,
+			reset		=> reset,
+			line_end	=> line_end,
+			frame_end	=> frame_end,
+			currentSample => currentSample,
+			lastSample	=> lastSample,
+			display_samples => display_samples,
+			displayDotSamples => displayDotSamples,
+			chAmplitude	=> chAmplitude,
+			chOffset	=> chOffset,
+			triggerXPos	=> triggerXPos,
+			triggerYPos	=> triggerYPos,
+			display_x	=> display_x,
+			r			=> uo_out(4),
+			g			=> uo_out(0),
+			b			=> uo_out(5),
+			hsync		=> uo_out(2),
+			vsync		=> uo_out(7),
+			de			=> uo_out(6)
 	);
 	uo_out(1) <= clk;	-- HDMI Clock
 
 	-- Settings Entity, attached to the buttons and switches
 	OSCILLOSCOPE_CONTROL : settings
-	port map (
-		clk			=> clk,
-		reset		=> reset,
-		sample_inputs => frame_end,
-		buttons		=> ui_in(3 downto 0),
-		switches	=> ui_in(5 downto 4),
-		trigger_start => trigger_start,
-		triggerOnRisingEdge => triggerOnRisingEdge,
-		displayDotSamples => displayDotSamples,
-		chAmplitude	=> chAmplitude,
-		chOffset	=> chOffset,
-		triggerXPos	=> triggerXPos,
-		triggerYPos	=> triggerYPos,
-		timebase	=> timebase,
-		memoryShift	=> memoryShift
+		port map (
+			clk			=> clk,
+			reset		=> reset,
+			sample_inputs => frame_end,
+			buttons		=> ui_in(3 downto 0),
+			switches	=> ui_in(5 downto 4),
+			trigger_start => trigger_start,
+			triggerOnRisingEdge => triggerOnRisingEdge,
+			displayDotSamples => displayDotSamples,
+			chAmplitude	=> chAmplitude,
+			chOffset	=> chOffset,
+			triggerXPos	=> triggerXPos,
+			triggerYPos	=> triggerYPos,
+			timebase	=> timebase,
+			memoryShift	=> memoryShift
 	);
 
 	-- Measurement State Machine Entity, attached to the ADC and FRAM
 	MEASUREMENTS : measurement_sm
-	port map (
-		clk			=> clk,
-		reset		=> reset,
-		trigger_start => trigger_start,
-		frame_end	=> frame_end,
-		line_end	=> line_end,
-		triggerXPos	=> triggerXPos,
-		triggerYPos	=> triggerYPos,
-		timebase	=> timebase,
-		memoryShift	=> memoryShift,
-		display_x	=> display_x,
-		sampleOnRisingEdge => triggerOnRisingEdge,
-		display_samples => display_samples,
-		current_sample => currentSample,
-		last_sample	=> lastSample,
-		fram_cs		=> uio_out(2),
-		fram_sclk	=> uio_out(0),
-		fram_mosi	=> uio_out(1),
-		fram_miso	=> ui_in(6),
-		adc_cs		=> uio_out(4),
-		adc_sclk	=> uio_out(3),
-		adc_miso	=> ui_in(7)
+		port map (
+			clk			=> clk,
+			reset		=> reset,
+			trigger_start => trigger_start,
+			frame_end	=> frame_end,
+			line_end	=> line_end,
+			triggerXPos	=> triggerXPos,
+			triggerYPos	=> triggerYPos,
+			timebase	=> timebase,
+			memoryShift	=> memoryShift,
+			display_x	=> display_x,
+			sampleOnRisingEdge => triggerOnRisingEdge,
+			display_samples => display_samples,
+			current_sample => currentSample,
+			last_sample	=> lastSample,
+			fram_cs		=> uio_out(2),
+			fram_sclk	=> uio_out(0),
+			fram_mosi	=> uio_out(1),
+			fram_miso	=> ui_in(6),
+			adc_cs		=> uio_out(4),
+			adc_sclk	=> uio_out(3),
+			adc_miso	=> ui_in(7)
 	);
 
 end Behavioral;

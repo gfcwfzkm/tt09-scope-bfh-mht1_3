@@ -21,7 +21,7 @@ entity settings is
 		chOffset : out unsigned(4 downto 0);
 		triggerXPos : out unsigned(3 downto 0);
 		triggerYPos : out unsigned(3 downto 0);
-		timebase : out unsigned(3 downto 0);
+		timebase : out unsigned(2 downto 0);
 		memoryShift : out signed(7 downto 0)
 	);
 end entity settings;
@@ -52,7 +52,7 @@ architecture rtl of settings is
 	constant TRIGGER_Y_MAX : unsigned(triggerYPos'length-1 downto 0)		:= to_unsigned(15,	triggerYPos'length);
 	constant TRIGGER_Y_MIN : unsigned(triggerYPos'length-1 downto 0)		:= to_unsigned(0,	triggerYPos'length);
 	constant TIMEBASE_DEFAULT : unsigned(timebase'length-1 downto 0)		:= to_unsigned(0,	timebase'length);
-	constant TIMEBASE_MAX : unsigned(timebase'length-1 downto 0)			:= to_unsigned(15,	timebase'length);
+	constant TIMEBASE_MAX : unsigned(timebase'length-1 downto 0)			:= to_unsigned(7,	timebase'length);
 	constant TIMEBASE_MIN : unsigned(timebase'length-1 downto 0)			:= to_unsigned(0,	timebase'length);
 	constant MEMORY_SHIFT_DEFAULT : signed(memoryShift'length-1 downto 0)	:= to_signed(0,		memoryShift'length);
 	constant MEMORY_SHIFT_MAX : signed(memoryShift'length-1 downto 0)		:= to_signed(127,	memoryShift'length);
@@ -105,6 +105,8 @@ begin
 		triggerYPos_next <= triggerYPos_reg;
 		timebase_next <= timebase_reg;
 		memoryShift_next <= memoryShift_reg;
+		triggerOnRisingEdge_next <= triggerOnRisingEdge_reg;
+		displayDotSamples_next <= displayDotSamples_reg;
 		trigger_start <= '0';
 
 		case debounced_switches is

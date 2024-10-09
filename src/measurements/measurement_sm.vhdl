@@ -13,7 +13,7 @@ entity measurement_sm is
 		line_end		: in std_logic;
 		triggerXPos		: in unsigned(3 downto 0);
 		triggerYPos		: in unsigned(3 downto 0);
-		timebase		: in unsigned(3 downto 0);
+		timebase		: in unsigned(2 downto 0);
 		memoryShift		: in signed(7 downto 0);
 		display_x		: in unsigned(9 downto 0);
 		sampleOnRisingEdge : in std_logic;
@@ -36,9 +36,9 @@ end entity measurement_sm;
 architecture rtl of measurement_sm is
 	component trigger_detection
 		port (
-			last_sample : in unsigned(7 downto 0);
-			current_sample : in unsigned(7 downto 0);
-			trigger_threshold : in unsigned(7 downto 0);
+			last_sample : in unsigned(3 downto 0);
+			current_sample : in unsigned(3 downto 0);
+			trigger_threshold : in unsigned(3 downto 0);
 			sample_on_rising_edge : in std_logic;
 			triggered : out std_logic
 		);
@@ -82,7 +82,7 @@ architecture rtl of measurement_sm is
 	constant DISPLAY_X_MAX : unsigned(display_x'length-1 downto 0) := to_unsigned(480, display_x'length);
 	type state_type is (INIT, WAIT_FOR_LINEEND, READ_FROM_FRAM);
 
-
+	signal display_x_calced			: unsigned(14 downto 0);
 	signal sample_address_calced	: unsigned(14 downto 0);
 	signal sample_start_address_reg, sample_start_address_next : unsigned(14 downto 0);
 	signal last_sample_reg, last_sample_next : unsigned(7 downto 0);
@@ -116,15 +116,17 @@ begin
 		end if;
 	end process CLKREG;
 
-	STATEMACHINE : process (state_reg, last_sample_reg, line_end, fram_isBusy, fram_isThereMoreToWrite) is
+	STATEMACHINE : process (state_reg, last_sample_reg, line_end, sample_from_fram, sample_start_address_reg, fram_isBusy, fram_isThereMoreToWrite, display_x) is
 	begin
 		state_next <= state_reg;
 		last_sample_next <= last_sample_reg;
+		sample_start_address_next <= sample_start_address_reg;
 		fram_readSample <= '0';
 
 		case state_reg is
 			when INIT =>
 				state_next <= WAIT_FOR_LINEEND;
+
 			when WAIT_FOR_LINEEND =>
 				if line_end = '1' then
 					fram_readSample <= '1';
@@ -142,13 +144,18 @@ begin
 	end process STATEMACHINE;
 
 	-- Calculate the address of the sample to be read from the FRAM
-	sample_address_calced <= sample_start_address_reg + resize(display_x, sample_address_calced'length) + to_unsigned(1, sample_address_calced'length)
-							 when display_x < DISPLAY_X_MAX else sample_start_address_reg;
+	display_x_calced <= shift_left(resize(display_x, display_x_calced'length), to_integer(timebase)) + shift_left(to_unsigned(1, display_x_calced'length), to_integer(timebase));
+
+	sample_address_calced <= sample_start_address_reg + display_x_calced when display_x < DISPLAY_X_MAX else sample_start_address_reg;
 
 	with state_reg select fram_address <=
-		sample_address_calced when WAIT_FOR_LINEEND,
-		sample_address_calced when READ_FROM_FRAM,
+		std_logic_vector(sample_address_calced) when WAIT_FOR_LINEEND,
+		std_logic_vector(sample_address_calced) when READ_FROM_FRAM,
 		(others => '0') when others;
+	
+	with state_reg select display_samples <=
+		'1' when WAIT_FOR_LINEEND,
+		'0' when others;
 
 	current_sample <= sample_from_fram;
 	last_sample <= last_sample_reg;

@@ -26,7 +26,7 @@ entity video is
 		triggerXPos		: in unsigned(3 downto 0);
 		triggerYPos		: in unsigned(3 downto 0);
 
-		display_x : in unsigned(c_HDMI_H_BITWIDTH-1 downto 0);
+		display_x : out unsigned(c_HDMI_H_BITWIDTH-1 downto 0);
 
 		-- Video Signals
 		r,g,b : out std_logic;
@@ -75,13 +75,15 @@ architecture rtl of video is
 	end component;
 begin
 
+	display_x <= draw_x;
+
 	Video_Timing_Generator : vtgen
 		port map (
 			clk => clk,
 			reset => reset,
 			disp_active => draw_active,
-			disp_x => draw_x,
-			disp_y => draw_y,
+			disp_x => draw_y,	-- X and Y are swapped because the screen is rotated CCW 90 degrees
+			disp_y => draw_x,	-- X and Y are swapped because the screen is rotated CCW 90 degrees
 			line_end => line_end,
 			frame_end => frame_end,
 			hdmi_vsync => vsync,
@@ -91,8 +93,8 @@ begin
 
 	Video_Signal_Merger : merge_generators
 		port map (
-			disp_x => draw_y,
-			disp_y => draw_x,
+			disp_x => draw_x,
+			disp_y => draw_y,
 			display_active => draw_active,
 			display_samples => display_samples,
 			currentSample => currentSample,
