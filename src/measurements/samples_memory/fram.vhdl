@@ -57,17 +57,13 @@ architecture rtl of fram is
 	signal spi_data_from_fram : std_logic_vector(7 downto 0) := (others => '0');
 
 	component spi_master
-		generic (
-			MSB_FIRST : boolean := TRUE;
-			NBITS : positive := 8
-		);
 		port (
 		  	clk : in std_logic;
 		  	reset : in std_logic;
 		  	start : in std_logic;
 		  	busy_wait : in std_logic;
-		  	data_in : in std_logic_vector(NBITS-1 downto 0);
-		  	data_out : out std_logic_vector(NBITS-1 downto 0);
+		  	data_in : in std_logic_vector(7 downto 0);
+		  	data_out : out std_logic_vector(7 downto 0);
 		  	busy : out std_logic;
 		  	sclk : out std_logic;
 		  	mosi : out std_logic;

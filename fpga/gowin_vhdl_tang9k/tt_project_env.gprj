@@ -7,20 +7,20 @@
     <FileList>
         <File path="src/gowin_rpll/gowin_rpll.vhd" type="file.vhdl" enable="1"/>
         <File path="src/simu_tt_top.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/adc/pmodAD1.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/measurement_sm.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/samples_memory/fram.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/samples_memory/spi_master.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/trigger_detection.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/debouncer.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/image_generators/channel_gen.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/image_generators/grid_gen.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/image_generators/merge_generators.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/image_generators/trigger_gen.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/video.vhdl" type="file.vhdl" enable="1"/>
-        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/vtgen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/measurements/adc/pmodAD1.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/measurements/measurement_sm.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/measurements/samples_memory/fram.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/measurements/samples_memory/spi_master.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/measurements/trigger_detection.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/settings/debouncer.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/settings/settings.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/video/image_generators/channel_gen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/video/image_generators/grid_gen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/video/image_generators/merge_generators.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/video/image_generators/trigger_gen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/video/video.vhdl" type="file.vhdl" enable="1"/>
+        <File path="../../src/video/vtgen.vhdl" type="file.vhdl" enable="1"/>
         <File path="src/tt_project_env.cst" type="file.cst" enable="1"/>
         <File path="src/tt_project_env.sdc" type="file.sdc" enable="1"/>
         <File path="src/tt_project_env.rao" type="file.gao" enable="0"/>
