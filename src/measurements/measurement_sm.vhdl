@@ -143,9 +143,10 @@ begin
 		end case;
 	end process STATEMACHINE;
 
-	-- Calculate the address of the sample to be read from the FRAM
+	-- Calculate the address of the sample to be read from the FRAM with the current timebase and display position
 	display_x_calced <= shift_left(resize(display_x, display_x_calced'length), to_integer(timebase)) + shift_left(to_unsigned(1, display_x_calced'length), to_integer(timebase));
 
+	-- Final calculation of the sample address, unless the display position is over the end of the display - then the address is the same as the start address
 	sample_address_calced <= sample_start_address_reg + display_x_calced when display_x < DISPLAY_X_MAX else sample_start_address_reg;
 
 	with state_reg select fram_address <=
@@ -184,7 +185,7 @@ begin
 			fram_miso => fram_miso
 	);
 
-	ADC : pmodAD1
+	SAMPLES_ADC : pmodAD1
 		port map (
 			clk => clk,
 			reset => reset,
