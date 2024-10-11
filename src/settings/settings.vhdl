@@ -52,7 +52,11 @@ entity settings is
 		--! Timebase setting (0: 1x, 1: 1/2x, 2: 1/4x, 3: 1/8x, 4: 1/16x, 5: 1/32x, 6: 1/64x, 7: 1/128x)
 		timebase : out unsigned(2 downto 0);
 		--! Memory shift setting (Shifts the memory start position to the right or left)
-		memoryShift : out signed(7 downto 0)
+		memoryShift : out signed(7 downto 0);
+		--! DSG frequency shift setting (Shifts the DSG frequency up or down)
+		dsgFreqShift : out unsigned(2 downto 0);
+		--! Waveform selection
+		waveform : out unsigned(1 downto 0)
 	);
 end entity settings;
 
@@ -105,10 +109,31 @@ architecture rtl of settings is
 	constant MEMORY_SHIFT_MAX : signed(memoryShift'length-1 downto 0)		:= to_signed(127,	memoryShift'length);
 	--! Minimum Memory Shift
 	constant MEMORY_SHIFT_MIN : signed(memoryShift'length-1 downto 0)		:= to_signed(-127,	memoryShift'length);
+	--! Default DSG Frequency Shift
+	constant DSG_FREQ_SHIFT_DEFAULT : unsigned(dsgFreqShift'length-1 downto 0) := to_unsigned(0, dsgFreqShift'length);
+	--! Maximum DSG Frequency Shift
+	constant DSG_FREQ_SHIFT_MAX : unsigned(dsgFreqShift'length-1 downto 0) := to_unsigned(4, dsgFreqShift'length);
+	--! Minimum DSG Frequency Shift
+	constant DSG_FREQ_SHIFT_MIN : unsigned(dsgFreqShift'length-1 downto 0) := to_unsigned(0, dsgFreqShift'length);
+	--! Waveform Default Setting on Sine
+	constant WAVEFORM_DEFAULT : unsigned(1 downto 0) := "00";
+	--! Waveform Maximum Setting
+	constant WAVEFORM_MAX : unsigned(1 downto 0) := "11";
+	--! Waveform Minimum Setting
+	constant WAVEFORM_MIN : unsigned(1 downto 0) := "00";
 	--! Default Trigger on Rising Edge
 	constant TRIGGER_ON_RISING_EDGE_DEFAULT : std_logic	:= '1';
 	--! Default Display Dot Samples
-	constant DISPLAY_DOT_SAMPLES_DEFAULT : std_logic	:= '1';
+	constant DISPLAY_DOT_SAMPLES_DEFAULT : std_logic	:= '0';
+
+	--! Button Layout 1
+	constant BTN_LAYOUT_1 : std_logic_vector(1 downto 0) := "00";
+	--! Button Layout 2
+	constant BTN_LAYOUT_2 : std_logic_vector(1 downto 0) := "01";
+	--! Button Layout 3
+	constant BTN_LAYOUT_3 : std_logic_vector(1 downto 0) := "10";
+	--! Button Layout 4
+	constant BTN_LAYOUT_4 : std_logic_vector(1 downto 0) := "11";
 
 	--! Debounced buttons pressed signal
 	signal debounced_buttons_pressed : std_logic_vector(3 downto 0);
@@ -129,8 +154,10 @@ architecture rtl of settings is
 	signal memoryShift_reg, memoryShift_next : signed(memoryShift'length-1 downto 0);
 	--! Register for the trigger on rising edge setting
 	signal triggerOnRisingEdge_reg, triggerOnRisingEdge_next : std_logic;
-	--! Register for the display dot samples setting
-	signal displayDotSamples_reg, displayDotSamples_next : std_logic;
+	--! Register for the DSG frequency setting
+	signal dsgFreqShift_reg, dsgFreqShift_next : unsigned(dsgFreqShift'length-1 downto 0);
+	--! Selected Waveform
+	signal selectedWaveform_reg, selectedWaveform_next : unsigned(1 downto 0);
 begin
 
 	--! Clocked registers for the settings
@@ -144,7 +171,7 @@ begin
 			timebase_reg <= TIMEBASE_DEFAULT;
 			memoryShift_reg <= MEMORY_SHIFT_DEFAULT;
 			triggerOnRisingEdge_reg <= TRIGGER_ON_RISING_EDGE_DEFAULT;
-			displayDotSamples_reg <= DISPLAY_DOT_SAMPLES_DEFAULT;
+			dsgFreqShift_reg <= DSG_FREQ_SHIFT_DEFAULT;
 		elsif rising_edge(clk) then
 			chAmplitude_reg <= chAmplitude_next;
 			chOffset_reg <= chOffset_next;
@@ -153,13 +180,13 @@ begin
 			timebase_reg <= timebase_next;
 			memoryShift_reg <= memoryShift_next;
 			triggerOnRisingEdge_reg <= triggerOnRisingEdge_next;
-			displayDotSamples_reg <= displayDotSamples_next;
+			dsgFreqShift_reg <= dsgFreqShift_next;
 		end if;
 	end process CLKREG;
 
 	--! State machine process for the settings
 	NSL : process(debounced_buttons_pressed, debounced_switches, chAmplitude_reg, chOffset_reg, triggerXPos_reg,
-				  triggerYPos_reg, timebase_reg, memoryShift_reg, triggerOnRisingEdge_reg, displayDotSamples_reg) is
+				  triggerYPos_reg, timebase_reg, memoryShift_reg, triggerOnRisingEdge_reg, dsgFreqShift_reg) is
 	begin
 		chAmplitude_next <= chAmplitude_reg;
 		chOffset_next <= chOffset_reg;
@@ -168,11 +195,11 @@ begin
 		timebase_next <= timebase_reg;
 		memoryShift_next <= memoryShift_reg;
 		triggerOnRisingEdge_next <= triggerOnRisingEdge_reg;
-		displayDotSamples_next <= displayDotSamples_reg;
+		dsgFreqShift_next <= dsgFreqShift_reg;
 		trigger_start <= '0';
 
 		case debounced_switches is
-			when "00" =>
+			when BTN_LAYOUT_1 =>
 				if debounced_buttons_pressed(0) = '1' then
 					-- Button 0: Trigger up
 					if triggerYPos_reg /= TRIGGER_Y_MAX then
@@ -184,17 +211,17 @@ begin
 						triggerYPos_next <= triggerYPos_reg - 1;
 					end if;
 				elsif debounced_buttons_pressed(2) = '1' then
-					-- Button 2: Trigger left
+					-- Button 2: Shift trigger point to the right
 					if triggerXPos_reg /= TRIGGER_X_MAX then
 						triggerXPos_next <= triggerXPos_reg + 1;
+					else
+						triggerXPos_next <= TRIGGER_X_MIN;
 					end if;
 				elsif debounced_buttons_pressed(3) = '1' then
-					-- Button 3: Trigger right
-					if triggerXPos_reg /= TRIGGER_X_MIN then
-						triggerXPos_next <= triggerXPos_reg - 1;
-					end if;
+					-- Button 3: Trigger on rising / falling edge
+					triggerOnRisingEdge_next <= not triggerOnRisingEdge_reg;
 				end if;
-			when "01" =>
+			when BTN_LAYOUT_2 =>
 				if debounced_buttons_pressed(0) = '1' then
 					-- Button 0: Zoom in
 					if chAmplitude_reg /= AMPLITUDE_MAX then
@@ -216,7 +243,7 @@ begin
 						chOffset_next <= chOffset_reg - 1;
 					end if;
 				end if;
-			when "10" =>
+			when BTN_LAYOUT_3 =>
 				if debounced_buttons_pressed(0) = '1' then
 					-- Button 0: Timebase up
 					if timebase_reg /= TIMEBASE_MAX then
@@ -238,16 +265,27 @@ begin
 						memoryShift_next <= memoryShift_reg - 1;
 					end if;
 				end if;
-			when "11" =>
+			when BTN_LAYOUT_4 =>
 				if debounced_buttons_pressed(0) = '1' then
 					-- Trigger Start / Stop
 					trigger_start <= '1';
 				elsif debounced_buttons_pressed(1) = '1' then
-					-- Trigger on rising or falling edge
-					triggerOnRisingEdge_next <= not triggerOnRisingEdge_reg;
+					-- Waveform select
+					if selectedWaveform_reg /= WAVEFORM_MAX then
+						selectedWaveform_next <= selectedWaveform_reg + 1;
+					else
+						selectedWaveform_next <= WAVEFORM_MIN;
+					end if;
 				elsif debounced_buttons_pressed(2) = '1' then
-					-- Display samples as dots or lines
-					displayDotSamples_next <= not displayDotSamples_reg;
+					-- Increase Frequency
+					if dsgFreqShift_reg /= DSG_FREQ_SHIFT_MAX then
+						dsgFreqShift_next <= dsgFreqShift_reg + 1;
+					end if;
+				elsif debounced_buttons_pressed(3) = '1' then
+					-- Decrease Frequency
+					if dsgFreqShift_reg /= DSG_FREQ_SHIFT_MIN then
+						dsgFreqShift_next <= dsgFreqShift_reg - 1;
+					end if;
 				end if;
 			when others =>
 				null;
@@ -262,7 +300,9 @@ begin
 	timebase <= timebase_reg;
 	memoryShift <= memoryShift_reg;
 	triggerOnRisingEdge <= triggerOnRisingEdge_reg;
-	displayDotSamples <= displayDotSamples_reg;
+	displayDotSamples <= DISPLAY_DOT_SAMPLES_DEFAULT;
+	dsgFreqShift <= dsgFreqShift_reg;
+	waveform <= selectedWaveform_reg;
 
 	--! Debounce the buttons
 	BUTTON_DEBOUNCER : for i in 0 to 3 generate

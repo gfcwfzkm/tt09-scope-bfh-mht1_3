@@ -65,7 +65,9 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			triggerXPos : out unsigned(3 downto 0);
 			triggerYPos : out unsigned(3 downto 0);
 			timebase : out unsigned(2 downto 0);
-			memoryShift : out signed(7 downto 0)
+			memoryShift : out signed(7 downto 0);
+			dsgFreqShift : out unsigned(2 downto 0);
+			waveform : out unsigned(1 downto 0)
 		);
 	end component;
 
@@ -95,6 +97,18 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 		);
 	end component;
 
+	component signal_gen
+		port (
+			clk : in std_logic;
+			reset : in std_logic;
+			SigGenFrequency : in unsigned(2 downto 0);
+			SigWaveSelect : in unsigned(1 downto 0);
+			da_cs : out std_logic;
+			da_sclk : out std_logic;
+			da_mosi : out std_logic
+		);
+	end component;
+
 	signal reset          : std_logic;
 	signal display_samples : std_logic;
 	signal frame_end	  : std_logic;
@@ -109,6 +123,8 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 	signal memoryShift	  : signed(7 downto 0);
 	signal triggerOnRisingEdge : std_logic;
 	signal displayDotSamples : std_logic;
+	signal dsgFreqShift : unsigned(2 downto 0);
+	signal waveform : unsigned(1 downto 0);
 
 	signal display_x : unsigned(9 downto 0);
 
@@ -122,7 +138,7 @@ begin
 	-- Set the bidirectional IOs to outputs
 	uio_oe <= "11111111";
 	
-	-- Video Generator Entity, attached to a 1bpp HDMI Pmod
+	--! Video Generator Entity, attached to a 1bpp HDMI Pmod
 	VIDEOGEN : video
 		port map (
 			clk			=> clk,
@@ -147,7 +163,7 @@ begin
 	);
 	uo_out(1) <= clk;	-- HDMI Clock
 
-	-- Settings Entity, attached to the buttons and switches
+	--! Settings Entity, attached to the buttons and switches
 	OSCILLOSCOPE_CONTROL : settings
 		port map (
 			clk			=> clk,
@@ -163,10 +179,12 @@ begin
 			triggerXPos	=> triggerXPos,
 			triggerYPos	=> triggerYPos,
 			timebase	=> timebase,
-			memoryShift	=> memoryShift
+			memoryShift	=> memoryShift,
+			dsgFreqShift => dsgFreqShift,
+			waveform	=> waveform
 	);
 
-	-- Measurement State Machine Entity, attached to the ADC and FRAM
+	--! Measurement State Machine Entity, attached to the ADC and FRAM
 	MEASUREMENTS : measurement_sm
 		port map (
 			clk			=> clk,
@@ -190,6 +208,18 @@ begin
 			adc_cs		=> uio_out(4),
 			adc_sclk	=> uio_out(3),
 			adc_miso	=> ui_in(7)
+	);
+
+	--! Signal Generator Entity, attached to the DAC
+	SIGGEN : signal_gen
+		port map (
+			clk				=> clk,
+			reset			=> reset,
+			SigGenFrequency => dsgFreqShift,
+			SigWaveSelect	=> waveform,
+			da_cs			=> uio_out(7),
+			da_sclk			=> uio_out(5),
+			da_mosi			=> uio_out(6)
 	);
 
 end Behavioral;

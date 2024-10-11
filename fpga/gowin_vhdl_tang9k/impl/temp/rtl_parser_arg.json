@@ -80,6 +80,36 @@
    "Library" : "work",
    "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/vtgen.vhdl",
    "Type" : "vhdl"
+  },
+  {
+   "Library" : "work",
+   "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/signal_gen.vhdl",
+   "Type" : "vhdl"
+  },
+  {
+   "Library" : "work",
+   "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/pmodDA2.vhdl",
+   "Type" : "vhdl"
+  },
+  {
+   "Library" : "work",
+   "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/waveforms/rectangle.vhdl",
+   "Type" : "vhdl"
+  },
+  {
+   "Library" : "work",
+   "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/waveforms/sawtooth.vhdl",
+   "Type" : "vhdl"
+  },
+  {
+   "Library" : "work",
+   "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/waveforms/sine.vhdl",
+   "Type" : "vhdl"
+  },
+  {
+   "Library" : "work",
+   "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/waveforms/triangle.vhdl",
+   "Type" : "vhdl"
   }
  ],
  "IncludePath" : [
