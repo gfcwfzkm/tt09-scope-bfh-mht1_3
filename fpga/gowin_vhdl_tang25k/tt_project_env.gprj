@@ -1,0 +1,33 @@
+<?xml version="1" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW5A-25A" pn="GW5A-LV25MG121NES">gw5a25a-000</Device>
+    <FileList>
+        <File path="src/simu_tt_top.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/adc/pmodAD1.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/measurement_sm.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/samples_memory/fram.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/samples_memory/spi_master.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/trigger_detection.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/debouncer.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/pmodDA2.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/signal_gen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/waveforms/rectangle.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/waveforms/sawtooth.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/waveforms/sine.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/waveforms/triangle.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/image_generators/channel_gen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/image_generators/grid_gen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/image_generators/merge_generators.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/image_generators/trigger_gen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/video.vhdl" type="file.vhdl" enable="1"/>
+        <File path="C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/vtgen.vhdl" type="file.vhdl" enable="1"/>
+        <File path="src/tt_project_env.cst" type="file.cst" enable="1"/>
+        <File path="src/tt_project_env.sdc" type="file.sdc" enable="1"/>
+        <File path="src/tt_project_env.gao" type="file.gao" enable="0"/>
+    </FileList>
+</Project>

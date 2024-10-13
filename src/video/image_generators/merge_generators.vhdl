@@ -46,7 +46,7 @@ entity merge_generators is
 		--! The offset of the channel
 		chOffset			: in unsigned(4 downto 0);
 		--! The trigger x position
-		triggerXPos			: in unsigned(3 downto 0);
+		triggerXPos			: in unsigned(2 downto 0);
 		--! The trigger y position
 		triggerYPos			: in unsigned(3 downto 0);
 
@@ -82,7 +82,7 @@ architecture rtl of merge_generators is
 		port (
 			disp_x : in unsigned(c_HDMI_H_BITWIDTH-1 downto 0);
 			disp_y : in unsigned(c_HDMI_V_BITWIDTH-1 downto 0);
-			triggerXPos :  unsigned(3 downto 0);
+			triggerXPos :  unsigned(2 downto 0);
 			triggerYPos :  unsigned(3 downto 0);
 			chOffset : in unsigned(4 downto 0);
 			chAmplitude : in signed(2 downto 0);

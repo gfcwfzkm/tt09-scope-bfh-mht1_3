@@ -34,7 +34,7 @@ entity trigger_gen is
 		disp_y		: in unsigned(c_HDMI_V_BITWIDTH-1 downto 0);
 
 		--! Trigger Horizontal Position
-		triggerXPos : unsigned(3 downto 0);
+		triggerXPos : unsigned(2 downto 0);
 		--! Trigger Vertical Position
 		triggerYPos : unsigned(3 downto 0);
 		--! Channel Offset
@@ -82,8 +82,8 @@ begin
 	triggerYPos_final <= triggerYPos_calced(c_HDMI_V_BITWIDTH-1 downto 0) when triggerYPos_calced(c_HDMI_V_BITWIDTH) = '0' else
 						 to_unsigned(c_DISPLAY_Y_MAX-1, c_HDMI_V_BITWIDTH);
 
-	-- Calculate the trigger X position by multiplying it by 32
-	triggerXPos_calced <= shift_left(resize(triggerXPos, c_HDMI_H_BITWIDTH), 5);
+	-- Calculate the trigger X position by multiplying it by 64 and adding 48
+	triggerXPos_calced <= shift_left(resize(triggerXPos, c_HDMI_H_BITWIDTH), 6) + 48;
 
 	-- Set the active signal for the X and Y position
 	trigger_active_x <= '1' when disp_x = triggerXPos_calced and disp_y > c_TRIGGER_Y_POS_MIN else '0';

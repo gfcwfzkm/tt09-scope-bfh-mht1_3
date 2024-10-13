@@ -38,7 +38,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			displayDotSamples	: in std_logic;
 			chAmplitude : in signed(2 downto 0);
 			chOffset : in unsigned(4 downto 0);
-			triggerXPos : in unsigned(3 downto 0);
+			triggerXPos : in unsigned(2 downto 0);
 			triggerYPos : in unsigned(3 downto 0);
 			display_x : out unsigned(9 downto 0);
 		  	r : out std_logic;
@@ -62,11 +62,11 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			displayDotSamples : out std_logic;
 			chAmplitude : out signed(2 downto 0);
 			chOffset : out unsigned(4 downto 0);
-			triggerXPos : out unsigned(3 downto 0);
+			triggerXPos : out unsigned(2 downto 0);
 			triggerYPos : out unsigned(3 downto 0);
 			timebase : out unsigned(2 downto 0);
-			memoryShift : out signed(7 downto 0);
-			dsgFreqShift : out unsigned(2 downto 0);
+			memoryShift : out signed(8 downto 0);
+			dsgFreqShift : out unsigned(1 downto 0);
 			waveform : out unsigned(1 downto 0)
 		);
 	end component;
@@ -78,10 +78,10 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			trigger_start : in std_logic;
 			frame_end : in std_logic;
 			line_end : in std_logic;
-			triggerXPos : in unsigned(3 downto 0);
+			triggerXPos : in unsigned(2 downto 0);
 			triggerYPos : in unsigned(3 downto 0);
 			timebase : in unsigned(2 downto 0);
-			memoryShift : in signed(7 downto 0);
+			memoryShift : in signed(8 downto 0);
 			display_x : in unsigned(9 downto 0);
 			triggerOnRisingEdge : in std_logic;
 			display_samples : out std_logic;
@@ -93,7 +93,8 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			fram_miso : in std_logic;
 			adc_cs : out std_logic;
 			adc_sclk : out std_logic;
-			adc_miso : in std_logic
+			adc_miso : in std_logic;
+			error_occurred	: out std_logic
 		);
 	end component;
 
@@ -101,7 +102,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 		port (
 			clk : in std_logic;
 			reset : in std_logic;
-			SigGenFrequency : in unsigned(2 downto 0);
+			SigGenFrequency : in unsigned(1 downto 0);
 			SigWaveSelect : in unsigned(1 downto 0);
 			da_cs : out std_logic;
 			da_sclk : out std_logic;
@@ -117,19 +118,21 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 	signal trigger_start : std_logic;
 	signal chAmplitude	  : signed(2 downto 0);
 	signal chOffset		  : unsigned(4 downto 0);
-	signal triggerXPos	  : unsigned(3 downto 0);
+	signal triggerXPos	  : unsigned(2 downto 0);
 	signal triggerYPos	  : unsigned(3 downto 0);
 	signal timebase		  : unsigned(2 downto 0);
-	signal memoryShift	  : signed(7 downto 0);
+	signal memoryShift	  : signed(8 downto 0);
 	signal triggerOnRisingEdge : std_logic;
 	signal displayDotSamples : std_logic;
-	signal dsgFreqShift : unsigned(2 downto 0);
+	signal dsgFreqShift : unsigned(1 downto 0);
 	signal waveform : unsigned(1 downto 0);
 
 	signal display_x : unsigned(9 downto 0);
 
 	signal currentSample : unsigned(7 downto 0);
 	signal lastSample	: unsigned(7 downto 0);
+	signal buttons		: std_logic_vector(3 downto 0);
+	signal switches		: std_logic_vector(1 downto 0);
 begin
 
 	-- Make the reset active-high
@@ -137,6 +140,13 @@ begin
 
 	-- Set the bidirectional IOs to outputs
 	uio_oe <= "11111111";
+
+	buttons(0) <= ui_in(1);
+	buttons(1) <= ui_in(5);
+	buttons(2) <= ui_in(2);
+	buttons(3) <= ui_in(6);
+	switches(0) <= ui_in(3);
+	switches(1) <= ui_in(7);
 	
 	--! Video Generator Entity, attached to a 1bpp HDMI Pmod
 	VIDEOGEN : video
@@ -169,8 +179,8 @@ begin
 			clk			=> clk,
 			reset		=> reset,
 			sample_inputs => frame_end,
-			buttons		=> ui_in(3 downto 0),
-			switches	=> ui_in(5 downto 4),
+			buttons		=> buttons,
+			switches	=> switches,
 			trigger_start => trigger_start,
 			triggerOnRisingEdge => triggerOnRisingEdge,
 			displayDotSamples => displayDotSamples,
@@ -201,13 +211,14 @@ begin
 			display_samples => display_samples,
 			current_sample => currentSample,
 			last_sample	=> lastSample,
-			fram_cs		=> uio_out(2),
-			fram_sclk	=> uio_out(0),
-			fram_mosi	=> uio_out(1),
-			fram_miso	=> ui_in(6),
-			adc_cs		=> uio_out(4),
-			adc_sclk	=> uio_out(3),
-			adc_miso	=> ui_in(7)
+			fram_cs		=> uio_out(6),
+			fram_sclk	=> uio_out(3),
+			fram_mosi	=> uio_out(7),
+			fram_miso	=> ui_in(0),
+			adc_cs		=> uio_out(0),
+			adc_sclk	=> uio_out(2),
+			adc_miso	=> ui_in(4),
+			error_occurred => uo_out(3)
 	);
 
 	--! Signal Generator Entity, attached to the DAC
@@ -217,9 +228,9 @@ begin
 			reset			=> reset,
 			SigGenFrequency => dsgFreqShift,
 			SigWaveSelect	=> waveform,
-			da_cs			=> uio_out(7),
+			da_cs			=> uio_out(4),
 			da_sclk			=> uio_out(5),
-			da_mosi			=> uio_out(6)
+			da_mosi			=> uio_out(1)
 	);
 
 end Behavioral;

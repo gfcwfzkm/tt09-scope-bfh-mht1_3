@@ -46,15 +46,15 @@ entity settings is
 		--! Channel offset setting (moves the samples up or down on the screen)
 		chOffset : out unsigned(4 downto 0);
 		--! Trigger X position setting (32 pixels per trigger position)
-		triggerXPos : out unsigned(3 downto 0);
+		triggerXPos : out unsigned(2 downto 0);
 		--! Trigger Y position setting (16 pixels per trigger position)
 		triggerYPos : out unsigned(3 downto 0);
 		--! Timebase setting (0: 1x, 1: 1/2x, 2: 1/4x, 3: 1/8x, 4: 1/16x, 5: 1/32x, 6: 1/64x, 7: 1/128x)
 		timebase : out unsigned(2 downto 0);
 		--! Memory shift setting (Shifts the memory start position to the right or left)
-		memoryShift : out signed(7 downto 0);
+		memoryShift : out signed(8 downto 0);
 		--! DSG frequency shift setting (Shifts the DSG frequency up or down)
-		dsgFreqShift : out unsigned(2 downto 0);
+		dsgFreqShift : out unsigned(1 downto 0);
 		--! Waveform selection
 		waveform : out unsigned(1 downto 0)
 	);
@@ -86,13 +86,13 @@ architecture rtl of settings is
 	--! Minimum Offset
 	constant OFFSET_MIN : unsigned(chOffset'length-1 downto 0)				:= to_unsigned(0,	chOffset'length);
 	--! Default Trigger X Position
-	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0)	:= to_unsigned(8,	triggerXPos'length);
+	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0)	:= to_unsigned(3,	triggerXPos'length);
 	--! Maximum Trigger X Position
-	constant TRIGGER_X_MAX : unsigned(triggerXPos'length-1 downto 0)		:= to_unsigned(15,	triggerXPos'length);
+	constant TRIGGER_X_MAX : unsigned(triggerXPos'length-1 downto 0)		:= to_unsigned(6,	triggerXPos'length);
 	--! Minimum Trigger X Position
 	constant TRIGGER_X_MIN : unsigned(triggerXPos'length-1 downto 0)		:= to_unsigned(0,	triggerXPos'length);
 	--! Default Trigger Y Position
-	constant TRIGGER_Y_DEFAULT : unsigned(triggerYPos'length-1 downto 0)	:= to_unsigned(4,	triggerYPos'length);
+	constant TRIGGER_Y_DEFAULT : unsigned(triggerYPos'length-1 downto 0)	:= to_unsigned(3,	triggerYPos'length);
 	--! Maximum Trigger Y Position
 	constant TRIGGER_Y_MAX : unsigned(triggerYPos'length-1 downto 0)		:= to_unsigned(15,	triggerYPos'length);
 	--! Minimum Trigger Y Position
@@ -106,13 +106,13 @@ architecture rtl of settings is
 	--! Default Memory Shift
 	constant MEMORY_SHIFT_DEFAULT : signed(memoryShift'length-1 downto 0)	:= to_signed(0,		memoryShift'length);
 	--! Maximum Memory Shift
-	constant MEMORY_SHIFT_MAX : signed(memoryShift'length-1 downto 0)		:= to_signed(127,	memoryShift'length);
+	constant MEMORY_SHIFT_MAX : signed(memoryShift'length-1 downto 0)		:= to_signed(255,	memoryShift'length);
 	--! Minimum Memory Shift
-	constant MEMORY_SHIFT_MIN : signed(memoryShift'length-1 downto 0)		:= to_signed(-127,	memoryShift'length);
+	constant MEMORY_SHIFT_MIN : signed(memoryShift'length-1 downto 0)		:= to_signed(-255,	memoryShift'length);
 	--! Default DSG Frequency Shift
 	constant DSG_FREQ_SHIFT_DEFAULT : unsigned(dsgFreqShift'length-1 downto 0) := to_unsigned(0, dsgFreqShift'length);
 	--! Maximum DSG Frequency Shift
-	constant DSG_FREQ_SHIFT_MAX : unsigned(dsgFreqShift'length-1 downto 0) := to_unsigned(4, dsgFreqShift'length);
+	constant DSG_FREQ_SHIFT_MAX : unsigned(dsgFreqShift'length-1 downto 0) := to_unsigned(3, dsgFreqShift'length);
 	--! Minimum DSG Frequency Shift
 	constant DSG_FREQ_SHIFT_MIN : unsigned(dsgFreqShift'length-1 downto 0) := to_unsigned(0, dsgFreqShift'length);
 	--! Waveform Default Setting on Sine
@@ -172,6 +172,7 @@ begin
 			memoryShift_reg <= MEMORY_SHIFT_DEFAULT;
 			triggerOnRisingEdge_reg <= TRIGGER_ON_RISING_EDGE_DEFAULT;
 			dsgFreqShift_reg <= DSG_FREQ_SHIFT_DEFAULT;
+			selectedWaveform_reg <= WAVEFORM_DEFAULT;
 		elsif rising_edge(clk) then
 			chAmplitude_reg <= chAmplitude_next;
 			chOffset_reg <= chOffset_next;
@@ -181,12 +182,13 @@ begin
 			memoryShift_reg <= memoryShift_next;
 			triggerOnRisingEdge_reg <= triggerOnRisingEdge_next;
 			dsgFreqShift_reg <= dsgFreqShift_next;
+			selectedWaveform_reg <= selectedWaveform_next;
 		end if;
 	end process CLKREG;
 
 	--! State machine process for the settings
 	NSL : process(debounced_buttons_pressed, debounced_switches, chAmplitude_reg, chOffset_reg, triggerXPos_reg,
-				  triggerYPos_reg, timebase_reg, memoryShift_reg, triggerOnRisingEdge_reg, dsgFreqShift_reg) is
+				  triggerYPos_reg, timebase_reg, memoryShift_reg, triggerOnRisingEdge_reg, dsgFreqShift_reg, selectedWaveform_reg) is
 	begin
 		chAmplitude_next <= chAmplitude_reg;
 		chOffset_next <= chOffset_reg;
@@ -196,6 +198,7 @@ begin
 		memoryShift_next <= memoryShift_reg;
 		triggerOnRisingEdge_next <= triggerOnRisingEdge_reg;
 		dsgFreqShift_next <= dsgFreqShift_reg;
+		selectedWaveform_next <= selectedWaveform_reg;
 		trigger_start <= '0';
 
 		case debounced_switches is
@@ -269,6 +272,8 @@ begin
 				if debounced_buttons_pressed(0) = '1' then
 					-- Trigger Start / Stop
 					trigger_start <= '1';
+					-- Reset the memory shift if the trigger is started
+					memoryShift_next <= MEMORY_SHIFT_DEFAULT;
 				elsif debounced_buttons_pressed(1) = '1' then
 					-- Waveform select
 					if selectedWaveform_reg /= WAVEFORM_MAX then

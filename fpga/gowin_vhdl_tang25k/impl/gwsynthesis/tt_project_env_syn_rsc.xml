@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module name="top" Register="1" Lut="1" T_Register="200(1)" T_Alu="121(0)" T_Lut="840(1)">
+    <SubModule name="TinyTapeout_Test" T_Register="199(0)" T_Alu="121(0)" T_Lut="839(0)">
+        <SubModule name="VIDEOGEN" T_Register="20(0)" T_Alu="38(0)" T_Lut="270(0)">
+            <SubModule name="Video_Timing_Generator" Register="20" Lut="38" T_Register="20(20)" T_Lut="38(38)"/>
+            <SubModule name="Video_Signal_Merger" Lut="153" T_Alu="38(0)" T_Lut="232(153)">
+                <SubModule name="Channel_Generator" Alu="32" Lut="61" T_Alu="32(32)" T_Lut="61(61)"/>
+                <SubModule name="Trigger_Generator" Alu="6" Lut="18" T_Alu="6(6)" T_Lut="18(18)"/>
+            </SubModule>
+        </SubModule>
+        <SubModule name="OSCILLOSCOPE_CONTROL" Register="32" Alu="13" Lut="60" T_Register="56(32)" T_Alu="13(13)" T_Lut="98(60)">
+            <SubModule name="BUTTON_DEBOUNCER[0].DEBOUNCE_BUTTONS" Register="4" Lut="10" T_Register="4(4)" T_Lut="10(10)"/>
+            <SubModule name="BUTTON_DEBOUNCER[1].DEBOUNCE_BUTTONS" Register="4" Lut="5" T_Register="4(4)" T_Lut="5(5)"/>
+            <SubModule name="BUTTON_DEBOUNCER[2].DEBOUNCE_BUTTONS" Register="4" Lut="8" T_Register="4(4)" T_Lut="8(8)"/>
+            <SubModule name="BUTTON_DEBOUNCER[3].DEBOUNCE_BUTTONS" Register="4" Lut="5" T_Register="4(4)" T_Lut="5(5)"/>
+            <SubModule name="SWITCH_DEBOUNCER[0].DEBOUNCE_SWITCHES" Register="4" Lut="5" T_Register="4(4)" T_Lut="5(5)"/>
+            <SubModule name="SWITCH_DEBOUNCER[1].DEBOUNCE_SWITCHES" Register="4" Lut="5" T_Register="4(4)" T_Lut="5(5)"/>
+        </SubModule>
+        <SubModule name="MEASUREMENTS" Register="56" Alu="48" Lut="204" T_Register="99(56)" T_Alu="62(48)" T_Lut="347(204)">
+            <SubModule name="SAMPLES_STORAGE" Register="13" Lut="37" T_Register="28(13)" T_Lut="108(37)">
+                <SubModule name="spi_master_inst" Register="15" Lut="71" T_Register="15(15)" T_Lut="71(71)"/>
+            </SubModule>
+            <SubModule name="SAMPLES_ADC" Register="15" Lut="35" T_Register="15(15)" T_Lut="35(35)"/>
+            <SubModule name="TRIGGER" Alu="14" T_Alu="14(14)"/>
+        </SubModule>
+        <SubModule name="SIGGEN" Register="9" Alu="8" Lut="8" T_Register="24(9)" T_Alu="8(8)" T_Lut="124(8)">
+            <SubModule name="SINE_GENERATOR" Lut="6" T_Lut="6(6)"/>
+            <SubModule name="DAC_PMOD" Register="15" Lut="110" T_Register="15(15)" T_Lut="110(110)"/>
+        </SubModule>
+    </SubModule>
+</Module>

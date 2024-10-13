@@ -5,13 +5,13 @@ use ieee.math_real.all;
 
 entity rectangle is
 	port (
-		counter : in unsigned(6 downto 0);
+		counter : in unsigned(7 downto 0);
 		rect_signal : out std_logic_vector(7 downto 0)
 	);
 end entity rectangle;
 
 architecture rtl of rectangle is
-	constant COUNTER_STEPS : integer := 128;
+	constant COUNTER_STEPS : integer := 256;
 	constant COUNTER_HALF : integer := COUNTER_STEPS/2;
 	constant RECT_MIN : std_logic_vector(rect_signal'length-1 downto 0) := x"00";
 	constant RECT_MAX : std_logic_vector(rect_signal'length-1 downto 0) := x"FF";

@@ -8,7 +8,7 @@ entity signal_gen is
 		clk   : in std_logic;
 		reset : in std_logic;
 
-		SigGenFrequency : in unsigned(2 downto 0);
+		SigGenFrequency : in unsigned(1 downto 0);
 		SigWaveSelect : in unsigned(1 downto 0);
 
 		da_cs : out std_logic;
@@ -20,27 +20,27 @@ end entity signal_gen;
 architecture rtl of signal_gen is
 	component sine
 		port (
-			counter : in unsigned(6 downto 0);
+			counter : in unsigned(7 downto 0);
 			sine_signal : out std_logic_vector(7 downto 0)
 		);
 	end component;
 	component rectangle
 		port (
-			counter : in unsigned(6 downto 0);
+			counter : in unsigned(7 downto 0);
 			rect_signal : out std_logic_vector(7 downto 0)
 		);
 	end component;
 	
 	component triangle
 		port (
-			counter : in unsigned(6 downto 0);
+			counter : in unsigned(7 downto 0);
 			triangle_signal : out std_logic_vector(7 downto 0)
 		);
 	end component;
 
 	component sawtooth
 		port (
-			counter : in unsigned(6 downto 0);
+			counter : in unsigned(7 downto 0);
 			saw_signal : out std_logic_vector(7 downto 0)
 		);
 	end component;
@@ -58,14 +58,29 @@ architecture rtl of signal_gen is
 		);
 	end component;
 
-	constant SELECTED_SINEWAVE : unsigned(1 downto 0) := "00";
-	constant SELECTED_SQUAREWAVE : unsigned(1 downto 0) := "01";
-	constant SELECTED_TRIANGLEWAVE : unsigned(1 downto 0) := "10";
-	constant SELECTED_SAWTOOTHWAVE : unsigned(1 downto 0) := "11";
+	constant SELECTED_SINEWAVE : unsigned(1 downto 0)		:= "00";
+	constant SELECTED_SQUAREWAVE : unsigned(1 downto 0)		:= "01";
+	constant SELECTED_TRIANGLEWAVE : unsigned(1 downto 0)	:= "10";
+	constant SELECTED_SAWTOOTHWAVE : unsigned(1 downto 0)	:= "11";
 	type state_type is (IDLE, SENDING);
+	type FreqArray is array(0 to 3) of unsigned(7 downto 0);
+
+	constant ADD_COUNT : FreqArray := (
+		"00000001",
+		"00000010",
+		"00000100",
+		"00001000"
+	);
+
+	constant AND_MASK : FreqArray := (
+		"11111111",
+		"11111110",
+		"11111100",
+		"11111000"
+	);
 
 	signal state_reg, state_next : state_type;
-	signal sig_counter_reg, sig_counter_next : unsigned(6 downto 0);
+	signal sig_counter_reg, sig_counter_next : unsigned(7 downto 0);
 
 	signal dac_busy : std_logic;
 	signal dac_start: std_logic;
@@ -75,6 +90,7 @@ architecture rtl of signal_gen is
 	signal squarewave : std_logic_vector(7 downto 0);
 	signal trianglewave : std_logic_vector(7 downto 0);
 	signal sawtoothwave : std_logic_vector(7 downto 0);
+	signal next_counter : unsigned(7 downto 0);
 begin
 
 	CLKGEN : process(clk, reset)
@@ -88,7 +104,7 @@ begin
 		end if;
 	end process CLKGEN;
 
-	WAVEFORM_GEN_NSL : process(sig_counter_reg, SigGenFrequency, state_reg, dac_busy) is
+	WAVEFORM_GEN_NSL : process(sig_counter_reg, SigGenFrequency, state_reg, dac_busy, next_counter) is
 	begin
 		sig_counter_next <= sig_counter_reg;
 		state_next <= state_reg;
@@ -102,8 +118,11 @@ begin
 				end if;
 			when SENDING =>
 				state_next <= IDLE;
-				sig_counter_next(6 downto to_integer(SigGenFrequency)) <= sig_counter_reg + shift_left(to_unsigned(1, 8), to_integer(SigGenFrequency));
-				sig_counter_next(to_integer(SigGenFrequency)-1 downto 0) <= (others => '0');
+				--sig_counter_next(6 downto to_integer(SigGenFrequency)) <= sig_counter_reg + shift_left(to_unsigned(1, 7), to_integer(SigGenFrequency));
+				--if SigGenFrequency > 0 then
+				--	sig_counter_next(to_integer(SigGenFrequency)-1 downto 0) <= (others => '0');
+				--end if;
+				sig_counter_next <= next_counter;
 		end case;
 	end process WAVEFORM_GEN_NSL;
 
@@ -113,6 +132,8 @@ begin
 		trianglewave when SELECTED_TRIANGLEWAVE,
 		sawtoothwave when SELECTED_SAWTOOTHWAVE,
 		x"10" when others;
+	
+	next_counter <= (sig_counter_reg and AND_MASK(to_integer(SigGenFrequency))) + ADD_COUNT(to_integer(SigGenFrequency));
 
 	SINE_GENERATOR : sine
 		port map (

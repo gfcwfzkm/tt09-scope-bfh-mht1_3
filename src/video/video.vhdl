@@ -45,7 +45,7 @@ entity video is
 		--! Channel offset
 		chOffset		: in unsigned(4 downto 0);
 		--! Trigger X position
-		triggerXPos		: in unsigned(3 downto 0);
+		triggerXPos		: in unsigned(2 downto 0);
 		--! Trigger Y position
 		triggerYPos		: in unsigned(3 downto 0);
 
@@ -95,7 +95,7 @@ architecture rtl of video is
 			displayDotSamples : in std_logic;
 			chAmplitude : in signed(2 downto 0);
 			chOffset : in unsigned(4 downto 0);
-			triggerXPos :  unsigned(3 downto 0);
+			triggerXPos :  unsigned(2 downto 0);
 			triggerYPos :  unsigned(3 downto 0);
 			red : out std_logic;
 			green : out std_logic;

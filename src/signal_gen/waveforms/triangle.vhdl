@@ -5,17 +5,19 @@ use ieee.math_real.all;
 
 entity triangle is
 	port (
-		counter : in unsigned(6 downto 0);
+		counter : in unsigned(7 downto 0);
 		triangle_signal : out std_logic_vector(7 downto 0)
 	);
 end entity triangle;
 
 architecture rtl of triangle is
-	constant COUNTER_STEPS : integer := 128;
+	constant COUNTER_STEPS : integer := 256;
 	constant COUNTER_HALF : integer := COUNTER_STEPS/2;
+	signal calc_triangle : std_logic_vector(7 downto 0);
 begin
 
-	triangle_signal <= (std_logic_vector(counter) & "0") when counter < COUNTER_HALF 
-              else (std_logic_vector(COUNTER_STEPS - counter) & "0");
+	calc_triangle <= std_logic_vector(counter) when counter < COUNTER_HALF 
+              else std_logic_vector(COUNTER_STEPS - 1 - counter);
+	triangle_signal <= calc_triangle(6 downto 0) & calc_triangle(6);
 
 end architecture;

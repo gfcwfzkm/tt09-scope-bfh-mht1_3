@@ -34,9 +34,12 @@ entity trigger_detection is
 end entity trigger_detection;
 
 architecture rtl of trigger_detection is
-
+	signal trig_rising_edge : std_logic;
+	signal trig_falling_edge : std_logic;
 begin
 
-	
+	trig_falling_edge <= '1' when (last_sample < trigger_threshold) and (current_sample >= trigger_threshold) else '0';
+	trig_rising_edge <= '1' when (last_sample > trigger_threshold) and (current_sample <= trigger_threshold) else '0';
+	triggered <= trig_rising_edge when sample_on_rising_edge = '1' else trig_falling_edge;
 
 end architecture;
