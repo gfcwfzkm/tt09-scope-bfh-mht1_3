@@ -64,7 +64,7 @@ entity measurement_sm is
 		--! ADC Master In Slave Out
 		adc_miso		: in std_logic;
 
-		--! Something Went wrong if this is high
+		--! Something Went wrong if this is high, can be observed with the Gowin Oscilloscope Tool
 		error_occurred	: out std_logic
 	);
 end entity measurement_sm;
@@ -122,6 +122,12 @@ architecture rtl of measurement_sm is
 	constant DISPLAY_X_MAX : unsigned(display_x'length-1 downto 0) := to_unsigned(480, display_x'length);
 	--! Sample Rate of the ADC
 	constant SAMPLERATE_CNT_MAX : integer := integer(25.0e6 / 500.0e3);
+	--! Trigger X-Pos Multiplication/Shift factor
+	constant TRIGGER_X_SHIFT : integer := 6;
+	--! Trigger X-Pos Offset
+	constant TRIGGER_X_OFFSET : integer := 48;
+	--! Memory Shift factor
+	constant MEMORY_SHIFT_FACTOR : integer := 5;
 
 	--! State machine states
 	type state_type is (
@@ -142,7 +148,7 @@ architecture rtl of measurement_sm is
 	signal sample_address_calced	: unsigned(14 downto 0);
 	--! Current start address of the samples in the FRAM when displaying, repurposed during writing for buffer calculations
 	signal sample_start_address_reg, sample_start_address_next : unsigned(14 downto 0);
-	--! Address Counter for the FRAM during sampling
+	--! Address Counter for the FRAM during sampling, repurposed during display to memorize the last trigger position
 	signal address_counter_reg, address_counter_next : unsigned(14 downto 0);
 	--! Last read sample from the FRAM
 	signal last_sample_reg, last_sample_next : unsigned(7 downto 0);
@@ -154,10 +160,12 @@ architecture rtl of measurement_sm is
 	signal sample_address_calced_shifted : unsigned(14 downto 0);
 	--! Has the trigger already been triggered?
 	signal alreadyTriggered_next, alreadyTriggered_reg : std_logic;
+	--! Position of the trigger in the memory samples
+	signal sample_trigger_address : unsigned(14 downto 0);
 	--! Got enough samples in the FRAM buffered?
 	signal enough_samples_in_fram_next, enough_samples_in_fram_reg : std_logic;
-	--! Stop the measurement process - register
-	signal stop_measurement_next, stop_measurement_reg : std_logic;
+	--! Has the trigger button been detected - register
+	signal trigger_btn_next, trigger_btn_reg : std_logic;
 	--! Signal for trigger detection
 	signal triggered : std_logic;
 
@@ -198,7 +206,7 @@ begin
 			address_counter_reg <= (others => '0');
 			samplerate_cnt_reg <= (others => '0');
 			alreadyTriggered_reg <= '0';
-			stop_measurement_reg <= '0';
+			trigger_btn_reg <= '0';
 			enough_samples_in_fram_reg <= '0';
 			state_reg <= INIT;
 		elsif rising_edge(clk) then
@@ -207,7 +215,7 @@ begin
 			address_counter_reg <= address_counter_next;
 			samplerate_cnt_reg <= samplerate_cnt_next;
 			alreadyTriggered_reg <= alreadyTriggered_next;
-			stop_measurement_reg <= stop_measurement_next;
+			trigger_btn_reg <= trigger_btn_next;
 			enough_samples_in_fram_reg <= enough_samples_in_fram_next;
 			state_reg <= state_next;
 		end if;
@@ -216,7 +224,7 @@ begin
 	--! State machine process
 	STATEMACHINE : process (state_reg, last_sample_reg, line_end, sample_from_fram, sample_start_address_reg, fram_isBusy,
 		enough_samples_in_fram_reg, sample_from_adc,adc_isBusy, triggered, triggerXPos, fram_isThereMoreToWrite, display_x,
-		frame_end, address_counter_reg, samplerate_cnt_reg, alreadyTriggered_reg, stop_measurement_reg, trigger_start) is
+		frame_end, address_counter_reg, samplerate_cnt_reg, alreadyTriggered_reg, trigger_btn_reg, trigger_start) is
 	begin
 		-- Register values
 		state_next <= state_reg;
@@ -224,7 +232,7 @@ begin
 		sample_start_address_next <= sample_start_address_reg;
 		address_counter_next <= address_counter_reg;
 		alreadyTriggered_next <= alreadyTriggered_reg;
-		stop_measurement_next <= stop_measurement_reg;
+		trigger_btn_next <= trigger_btn_reg;
 		enough_samples_in_fram_next <= enough_samples_in_fram_reg;
 
 		-- Default values
@@ -240,64 +248,90 @@ begin
 
 		-- Reset the stop_measurement flag if a trigger occurred
 		if trigger_start = '1' then
-			stop_measurement_next <= '1';
+			trigger_btn_next <= '1';
 		end if;
 		
 		case state_reg is
 			when INIT =>
+				-- We got nothing to initialize, jump to the display/view modi
 				state_next <= WAIT_FOR_LINEEND;
 			when WAIT_FOR_LINEEND =>
-				if stop_measurement_reg = '1' then
+				if trigger_btn_reg = '1' then
+					-- If the trigger button has been hit, start the measurement process!
+					-- Reset the address counter and the sample start address
 					sample_start_address_next <= to_unsigned(0, sample_start_address_next'length);
 					address_counter_next <= to_unsigned(0, address_counter_next'length);
+					-- Let the FRAM initialize a multiple-write process
 					fram_writeSamples <= '1';
-					state_next <= PREP_FRAM_FOR_SAMPLES;
+					-- Reset the "already triggered" flag
 					alreadyTriggered_next <= '0';
+					-- Jump to the next state
+					state_next <= PREP_FRAM_FOR_SAMPLES;
 				elsif frame_end = '1' then
+					-- If the frame end has been reached, issue a sample read and jump to the next state
 					fram_readSample <= '1';
 					state_next <= FRAME_END_REACHED;
 				elsif line_end = '1' then
+					-- If the line end has been reached, issue a sample read, 
+					-- keep the current sample as last sample and jump to the next state
 					fram_readSample <= '1';
 					last_sample_next <= sample_from_fram;
 					state_next <= READ_FROM_FRAM;
 				end if;
 			when READ_FROM_FRAM =>
 				if fram_isBusy = '0' then
+					-- Wait until the FRAM is not busy anymore - means the sample can be read from it
 					if display_x = 0 then
+						-- If the display is at the starting position, use the new sample as last sample
+						-- to avoid a jump in the display
 						last_sample_next <= sample_from_fram;
 					end if;
+					-- Jump back to the WAIT_FOR_LINEEND state
 					state_next <= WAIT_FOR_LINEEND;
 				end if;
 			when FRAME_END_REACHED =>
 				if fram_isBusy = '0' then
+					-- Wait until the FRAM is not busy anymore - means the sample can be read from it
+					-- Overwrite the last sample with the current sample
 					last_sample_next <= sample_from_fram;
 					state_next <= WAIT_FOR_LINEEND;
 				end if;
 			when PREP_FRAM_FOR_SAMPLES =>
+				-- Wait for the FRAM to be done initializing the multiple-write-process
 				if fram_isThereMoreToWrite = '1' then
-					state_next <= MEASURE_ADC;
+					-- Reset the samplerate-counter and the trigger-button-flag registers
 					samplerate_cnt_next <= to_unsigned(0, samplerate_cnt_next'length);
-					stop_measurement_next <= '0';
+					trigger_btn_next <= '0';
+					state_next <= MEASURE_ADC;
 				end if;
 			when MEASURE_ADC =>
 				if samplerate_cnt_reg = SAMPLERATE_CNT_MAX-1 then
+					-- If the samplerate counter has reached the maximum, start the ADC
 					adc_start <= '1';
-					state_next <= CHECK_ADC;
+					-- Increase the address counter
 					address_counter_next <= address_counter_reg + 1;
+					-- Memorize the last/previous sample
 					last_sample_next <= sample_from_adc;
+					-- Reset the samplerate counter
 					samplerate_cnt_next <= to_unsigned(0, samplerate_cnt_next'length);
+					state_next <= CHECK_ADC;
 				end if;
 			when CHECK_ADC =>
+				-- Check if the ADC is done with the sample
 				if adc_isBusy = '0' then
+					-- Have we already triggered a stop, either manually or by the trigger?
 					if alreadyTriggered_reg = '1' then
 						-- Have we collected enough samples?
 						if address_counter_reg = sample_start_address_reg + MEMORY_HALFSIZE then
+							-- If so, wrap things up!
 							fram_doneWriting <= '1';
 							state_next <= WRAP_UP_MEASUREMENT;
 						else
+							-- Nope, store the sample in the FRAM
 							state_next <= STORE_IN_MEM;
 						end if;
 					else
+						-- We haven't triggered a stop yet, so we will definitely store the sample in the FRAM
 						state_next <= STORE_IN_MEM;
 
 						-- Check if enough samples are in the FRAM buffer
@@ -307,10 +341,10 @@ begin
 
 						-- If we buffered enough samples already, check if a trigger or stop occurred
 						if enough_samples_in_fram_reg = '1' then
-							if stop_measurement_reg = '1' or triggered = '1' then
+							if trigger_btn_reg = '1' or triggered = '1' then
 								-- If a trigger or stop occurred, remember the start address and
 								-- prepare to fill the second half of the FRAM with data
-								stop_measurement_next <= '0';
+								trigger_btn_next <= '0';
 								sample_start_address_next <= address_counter_reg;
 								enough_samples_in_fram_next <= '0';
 								alreadyTriggered_next <= '1';
@@ -328,81 +362,91 @@ begin
 					error_occurred <= '1';
 				end if;
 			when WRAP_UP_MEASUREMENT =>
-				-- Calculate the start address so the trigger point aligns with the display
-				sample_start_address_next <= sample_start_address_reg - shift_left(resize(triggerXPos, sample_start_address_reg), 6) - 48;
+				-- Memorize the trigger settings and the start address (used for the sample start address calculation)
+				address_counter_next <= shift_left(resize(triggerXPos, address_counter_next'length), TRIGGER_X_SHIFT) + TRIGGER_X_OFFSET;
 				state_next <= WAIT_FOR_LINEEND;
 			when others =>
+				-- Should never happen!
 				state_next <= INIT;
+				error_occurred <= '1';
 		end case;
 	end process STATEMACHINE;
 
 	-- Calculate the address of the sample to be read from the FRAM with the current timebase and display position
 	display_x_calced <= shift_left(resize(display_x, display_x_calced'length), to_integer(timebase)) + shift_left(to_unsigned(1, display_x_calced'length), to_integer(timebase));
 
+	-- address_counter_reg is repurposed during display-mode to memorize the last trigger position
+	-- This is now used to retain the correct trigger position even when the timebase is changed after capture.
+	sample_trigger_address <= sample_start_address_reg - shift_left(address_counter_reg, to_integer(timebase));
+
 	-- Sample start address calculation
-	sample_address_calced_shifted <= unsigned(shift_left(resize(memoryShift, sample_start_address_reg'length), 5)) + sample_start_address_reg;
+	sample_address_calced_shifted <= unsigned(shift_left(resize(memoryShift, sample_start_address_reg'length), MEMORY_SHIFT_FACTOR)) + sample_trigger_address;
 
 	-- Final calculation of the sample address, unless the display position is over the end of the display - then the address is the same as the start address
 	sample_address_calced <= sample_address_calced_shifted + display_x_calced when display_x /= DISPLAY_X_MAX-1  else sample_address_calced_shifted;
 
+	--! Set the FRAM address to the calculated sample address in the display/view mode, otherwise use the address counter
 	with state_reg select fram_address <=
 		std_logic_vector(sample_address_calced) when WAIT_FOR_LINEEND,
 		std_logic_vector(sample_address_calced) when READ_FROM_FRAM,
 		std_logic_vector(sample_address_calced) when FRAME_END_REACHED,
 		std_logic_vector(address_counter_reg) when others;
 	
+	--! Display the samples on the screen only in the WAIT_FOR_LINEEND state
 	with state_reg select display_samples <=
 		'1' when WAIT_FOR_LINEEND,
 		'0' when others;
 
+	--! Output sample signals
 	current_sample <= sample_from_fram;
 	last_sample <= last_sample_reg;
 	
+	-- Convert the samples from the ADC/FRAM from std_logic_vector to unsigned for easier handling
 	sample_from_adc <= unsigned(sample_from_adc_slv);
 	sample_from_fram <= unsigned(sample_from_fram_slv);
 	
 	--! FRAM Component with 2^15 bytes of storage
 	SAMPLES_STORAGE : fram 
 		port map (
-			clk => clk,
-			reset => reset,
-			start_read_single => fram_readSample,
-			start_write_single => '0',
-			start_read_multiple => '0',
-			start_write_multiple => fram_writeSamples,
-			another_m_rw_exchange => fram_writeNextSample,
-			close_m_rw_exchange => fram_doneWriting,
-			fram_busy => fram_isBusy,
-			request_m_next_data => fram_isThereMoreToWrite,
-			fram_address => fram_address,
-			data_to_fram => sample_from_adc_slv,
-			data_from_fram => sample_from_fram_slv,
-			fram_cs_n => fram_cs,
-			fram_sck => fram_sclk,
-			fram_mosi => fram_mosi,
-			fram_miso => fram_miso
+			clk						=> clk,
+			reset					=> reset,
+			start_read_single		=> fram_readSample,
+			start_write_single		=> '0',
+			start_read_multiple		=> '0',
+			start_write_multiple	=> fram_writeSamples,
+			another_m_rw_exchange	=> fram_writeNextSample,
+			close_m_rw_exchange		=> fram_doneWriting,
+			fram_busy				=> fram_isBusy,
+			request_m_next_data		=> fram_isThereMoreToWrite,
+			fram_address			=> fram_address,
+			data_to_fram			=> sample_from_adc_slv,
+			data_from_fram			=> sample_from_fram_slv,
+			fram_cs_n				=> fram_cs,
+			fram_sck				=> fram_sclk,
+			fram_mosi				=> fram_mosi,
+			fram_miso				=> fram_miso
 	);
 
 	--! ADC Component with 8-bit resolution
 	SAMPLES_ADC : pmodAD1
 		port map (
-			clk => clk,
-			reset => reset,
-			start => adc_start,
-			busy => adc_isBusy,
-			data => sample_from_adc_slv,
-			sclk => adc_sclk,
-			miso => adc_miso,
-			cs_n => adc_cs
+			clk		=> clk,
+			reset	=> reset,
+			start	=> adc_start,
+			busy	=> adc_isBusy,
+			data	=> sample_from_adc_slv,
+			sclk	=> adc_sclk,
+			miso	=> adc_miso,
+			cs_n	=> adc_cs
 	);
 
 	--! Trigger Detection Component
 	TRIGGER : trigger_detection
 		port map (
-			last_sample => last_sample_reg(7 downto 4),
-			current_sample => sample_from_adc(7 downto 4),
-			trigger_threshold => triggerYPos,
-			sample_on_rising_edge => triggerOnRisingEdge,
-			triggered => triggered
+			last_sample				=> last_sample_reg(7 downto 4),
+			current_sample			=> sample_from_adc(7 downto 4),
+			trigger_threshold		=> triggerYPos,
+			sample_on_rising_edge	=> triggerOnRisingEdge,
+			triggered				=> triggered
 	);
 end architecture;
