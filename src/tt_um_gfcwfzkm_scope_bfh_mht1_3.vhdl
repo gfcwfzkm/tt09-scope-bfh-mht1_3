@@ -110,6 +110,22 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 		);
 	end component;
 
+	component print_settings
+		port (
+			clk : in std_logic;
+			reset : in std_logic;
+			triggerOnRisingEdge : in std_logic;
+			triggerXPos : in unsigned(2 downto 0);
+			triggerYPos : in unsigned(3 downto 0);
+			chAmplitude : in signed(2 downto 0);
+			chOffset : in unsigned(4 downto 0);
+			timebase : in unsigned(2 downto 0);
+			dsgFreqShift : in unsigned(1 downto 0);
+			waveform : in unsigned(1 downto 0);
+			tx : out std_logic
+		);
+	  end component;
+
 	signal reset          : std_logic;
 	signal display_samples : std_logic;
 	signal frame_end	  : std_logic;
@@ -218,7 +234,7 @@ begin
 			adc_cs		=> uio_out(0),
 			adc_sclk	=> uio_out(2),
 			adc_miso	=> ui_in(4),
-			error_occurred => uo_out(3)
+			error_occurred => open
 	);
 
 	--! Signal Generator Entity, attached to the DAC
@@ -231,6 +247,22 @@ begin
 			da_cs			=> uio_out(4),
 			da_sclk			=> uio_out(5),
 			da_mosi			=> uio_out(1)
+	);
+
+	--! Print Settings Entity, attached to the UART
+	SETTINGS_UART_PRINTER : print_settings
+		port map (
+			clk					=> clk,
+			reset				=> reset,
+			triggerOnRisingEdge => triggerOnRisingEdge,
+			triggerXPos			=> triggerXPos,
+			triggerYPos			=> triggerYPos,
+			chAmplitude			=> chAmplitude,
+			chOffset			=> chOffset,
+			timebase			=> timebase,
+			dsgFreqShift		=> dsgFreqShift,
+			waveform			=> waveform,
+			tx					=> uo_out(3)
 	);
 
 end Behavioral;

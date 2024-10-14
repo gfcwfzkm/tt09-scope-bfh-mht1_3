@@ -40,6 +40,8 @@ project:
     - "signal_gen/waveforms/rectangle.vhdl"
     - "signal_gen/waveforms/sawtooth.vhdl"
     - "signal_gen/waveforms/triangle.vhdl"
+    - "serial_out/print_settings.vhdl"
+    - "serial_out/uart_tx.vhdl"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:

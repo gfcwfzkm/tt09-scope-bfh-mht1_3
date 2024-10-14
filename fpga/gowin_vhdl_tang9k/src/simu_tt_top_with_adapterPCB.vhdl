@@ -11,7 +11,8 @@ entity top is
 
 		ui_in		: in std_logic_vector(7 downto 0);
 		uo_out		: out std_logic_vector(7 downto 0);
-		uio_out		: out std_logic_vector(7 downto 0)
+		uio_out		: out std_logic_vector(7 downto 0);
+		FPGA_TX     : out std_logic
 	);
 end entity top;
 
@@ -58,6 +59,7 @@ begin
 	-- Init the tiny-tapeout style top file
 	rst_n <= BTN_S1;
 	enabled <= '1';
+	FPGA_TX <= uo_out(3);
 
 	TinyTapeout_Test : tt_um_gfcwfzkm_scope_bfh_mht1_3
 	port map (

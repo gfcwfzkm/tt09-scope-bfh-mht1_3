@@ -5,8 +5,10 @@
 //Part Number: GW1NR-LV9QN88PC6/I5
 //Device: GW1NR-9
 //Device Version: C
-//Created Time: Mon 10 14 13:24:33 2024
+//Created Time: Mon 10 14 16:37:51 2024
 
+IO_LOC "FPGA_TX" 17;
+IO_PORT "FPGA_TX" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8 BANK_VCCIO=1.8;
 IO_LOC "uio_out[7]" 29;
 IO_PORT "uio_out[7]" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=4 BANK_VCCIO=1.8;
 IO_LOC "uio_out[6]" 30;

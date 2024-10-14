@@ -9,7 +9,7 @@
   "SubInsts" : [
    {
     "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/fpga/gowin_vhdl_tang9k/src/simu_tt_top_with_adapterPCB.vhdl",
-    "InstLine" : 44,
+    "InstLine" : 45,
     "InstName" : "PLL_TO_50MHZ",
     "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/fpga/gowin_vhdl_tang9k/src/gowin_rpll/gowin_rpll.vhd",
     "ModuleLine" : 13,
@@ -17,7 +17,7 @@
    },
    {
     "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/fpga/gowin_vhdl_tang9k/src/simu_tt_top_with_adapterPCB.vhdl",
-    "InstLine" : 62,
+    "InstLine" : 64,
     "InstName" : "TinyTapeout_Test",
     "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl",
     "ModuleLine" : 15,
@@ -25,7 +25,7 @@
     "SubInsts" : [
      {
       "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl",
-      "InstLine" : 152,
+      "InstLine" : 168,
       "InstName" : "VIDEOGEN",
       "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/video/video.vhdl",
       "ModuleLine" : 16,
@@ -77,7 +77,7 @@
      },
      {
       "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl",
-      "InstLine" : 177,
+      "InstLine" : 193,
       "InstName" : "OSCILLOSCOPE_CONTROL",
       "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl",
       "ModuleLine" : 22,
@@ -135,7 +135,7 @@
      },
      {
       "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl",
-      "InstLine" : 198,
+      "InstLine" : 214,
       "InstName" : "MEASUREMENTS",
       "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/measurement_sm.vhdl",
       "ModuleLine" : 18,
@@ -179,7 +179,7 @@
      },
      {
       "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl",
-      "InstLine" : 225,
+      "InstLine" : 241,
       "InstName" : "SIGGEN",
       "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/signal_gen.vhdl",
       "ModuleLine" : 17,
@@ -224,6 +224,24 @@
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/signal_gen/pmodDA2.vhdl",
         "ModuleLine" : 18,
         "ModuleName" : "pmodDA2"
+       }
+      ]
+     },
+     {
+      "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/tt_um_gfcwfzkm_scope_bfh_mht1_3.vhdl",
+      "InstLine" : 253,
+      "InstName" : "SETTINGS_UART_PRINTER",
+      "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/serial_out/print_settings.vhdl",
+      "ModuleLine" : 16,
+      "ModuleName" : "print_settings",
+      "SubInsts" : [
+       {
+        "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/serial_out/print_settings.vhdl",
+        "InstLine" : 184,
+        "InstName" : "UART_TX_MODULE",
+        "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/serial_out/uart_tx.vhdl",
+        "ModuleLine" : 16,
+        "ModuleName" : "uart_tx"
        }
       ]
      }
