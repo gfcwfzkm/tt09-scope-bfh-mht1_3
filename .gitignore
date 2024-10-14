@@ -13,5 +13,7 @@ test/results.xml
 test/gate_level_netlist.v
 fpga/gowin_vhdl_tang9k/impl/gwsynthesis
 fpga/gowin_vhdl_tang9k/impl/pnr
+fpga/gowin_vhdl_tang25k/impl/gwsynthesis
+fpga/gowin_vhdl_tang25k/impl/pnr
 gds_render_preview.png
 gds_render_preview.svg
