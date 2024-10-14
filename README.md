@@ -12,11 +12,13 @@ Since an external FRAM memory is used with no buffers on the chip, the screen is
 
 The signal generator supports a few basic waveforms: sine, square, triangle and sawtooth. The frequency and amplitude can be adjusted using the buttons and switches at the cost of the resolution of the signal. The signal generator is also used to test the trigger functionality and the display of the oscilloscope.
 
+In addition to see what settings have currently been selected, they are also transmitted via UART at 9600 baud (8N1) at uo_out(3).
+
 ![Image of Scope](docs/scope_screen.png)
 
 ## How to test
 
-Connect the various Pmods to the TinyTapeout or FPGA board according to the (pinout description in the info.yaml file)[../info.yaml]. Connect the output of the DAC to the input of the ADC and connect the HDMI Pmod to a screen or HDMI capture card. Run the trigger to capture a single-shot measurement and display the data on the screen.
+Connect the various Pmods to the TinyTapeout or FPGA board according to the (pinout description in the info.yaml file)[info.yaml]. Connect the output of the DAC to the input of the ADC and connect the HDMI Pmod to a screen or HDMI capture card. Run the trigger to capture a single-shot measurement and display the data on the screen.
 
 ## External hardware
 

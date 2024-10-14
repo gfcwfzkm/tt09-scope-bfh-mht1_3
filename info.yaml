@@ -69,7 +69,7 @@ pinout:
   uio[0]: "HDMI Pmod Green"
   uio[1]: "HDMI Pmod Clock"
   uio[2]: "HDMI Pmod HSYNC"
-  uio[3]: "UART Information"
+  uio[3]: "UART_TX Settings Info (9600bps, 8N1)"
   uio[4]: "HDMI Pmod Red"
   uio[5]: "HDMI Pmod Blue"
   uio[6]: "HDMI Pmod DE"
