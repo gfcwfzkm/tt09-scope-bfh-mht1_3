@@ -8,7 +8,7 @@
   },
   {
    "Library" : "work",
-   "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/fpga/gowin_vhdl_tang9k/src/simu_tt_top.vhdl",
+   "Path" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/fpga/gowin_vhdl_tang9k/src/simu_tt_top_with_adapterPCB.vhdl",
    "Type" : "vhdl"
   },
   {
