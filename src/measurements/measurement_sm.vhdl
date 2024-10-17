@@ -115,17 +115,14 @@ architecture rtl of measurement_sm is
 		);
 	end component;
 
+	--! Maximum half size of the memory
 	constant MEMORY_HALFSIZE : unsigned(14 downto 0) := to_unsigned((2**15)/2 - 1, 15);
-	--! Default trigger X position
-	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0) := to_unsigned(3, triggerXPos'length);
 	--! Display X maximum value
 	constant DISPLAY_X_MAX : unsigned(display_x'length-1 downto 0) := to_unsigned(480, display_x'length);
 	--! Sample Rate of the ADC
 	constant SAMPLERATE_CNT_MAX : integer := integer(25.0e6 / 500.0e3);
-	--! Trigger X-Pos Multiplication/Shift factor
-	constant TRIGGER_X_SHIFT : integer := 6;
 	--! Trigger X-Pos Offset
-	constant TRIGGER_X_OFFSET : integer := 48;
+	constant TRIGGER_X_OFFSET : integer := 60;
 	--! Memory Shift factor
 	constant MEMORY_SHIFT_FACTOR : integer := 5;
 
@@ -203,7 +200,7 @@ begin
 		if reset = '1' then
 			last_sample_reg <= (others => '0');
 			sample_start_address_reg <= (others => '0');
-			address_counter_reg <= (others => '0');
+			address_counter_reg <= (14 => '1', others => '0');
 			samplerate_cnt_reg <= (others => '0');
 			alreadyTriggered_reg <= '0';
 			trigger_btn_reg <= '0';
@@ -363,7 +360,7 @@ begin
 				end if;
 			when WRAP_UP_MEASUREMENT =>
 				-- Memorize the trigger settings and the start address (used for the sample start address calculation)
-				address_counter_next <= shift_left(resize(triggerXPos, address_counter_next'length), TRIGGER_X_SHIFT) + TRIGGER_X_OFFSET;
+				address_counter_next <= to_unsigned(TRIGGER_X_OFFSET, address_counter_next'length - triggerXPos'length) * triggerXPos;
 				state_next <= WAIT_FOR_LINEEND;
 			when others =>
 				-- Should never happen!

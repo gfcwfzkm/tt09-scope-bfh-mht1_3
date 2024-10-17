@@ -86,9 +86,9 @@ architecture rtl of settings is
 	--! Minimum Offset
 	constant OFFSET_MIN : unsigned(chOffset'length-1 downto 0)				:= to_unsigned(0,	chOffset'length);
 	--! Default Trigger X Position
-	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0)	:= to_unsigned(3,	triggerXPos'length);
+	constant TRIGGER_X_DEFAULT : unsigned(triggerXPos'length-1 downto 0)	:= to_unsigned(4,	triggerXPos'length);
 	--! Maximum Trigger X Position
-	constant TRIGGER_X_MAX : unsigned(triggerXPos'length-1 downto 0)		:= to_unsigned(6,	triggerXPos'length);
+	constant TRIGGER_X_MAX : unsigned(triggerXPos'length-1 downto 0)		:= to_unsigned(7,	triggerXPos'length);
 	--! Minimum Trigger X Position
 	constant TRIGGER_X_MIN : unsigned(triggerXPos'length-1 downto 0)		:= to_unsigned(0,	triggerXPos'length);
 	--! Default Trigger Y Position

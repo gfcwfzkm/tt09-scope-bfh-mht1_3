@@ -25,7 +25,9 @@ entity trigger_gen is
 		--! Minimum X position of the trigger
 		c_TRIGGER_X_POS_MIN : positive := 480-32;
 		--! Minimum Y position of the trigger
-		c_TRIGGER_Y_POS_MIN : positive := 640-32
+		c_TRIGGER_Y_POS_MIN : positive := 640-32;
+		--! Trigger X position step
+		c_TRIGGER_X_STEP : positive := 60
 	);
 	port (
 		--! X Position of Display
@@ -83,7 +85,8 @@ begin
 						 to_unsigned(c_DISPLAY_Y_MAX-1, c_HDMI_V_BITWIDTH);
 
 	-- Calculate the trigger X position by multiplying it by 64 and adding 48
-	triggerXPos_calced <= shift_left(resize(triggerXPos, c_HDMI_H_BITWIDTH), 6) + 48;
+	-- triggerXPos_calced <= shift_left(resize(triggerXPos, c_HDMI_H_BITWIDTH), 6) + 48;
+	triggerXPos_calced <= to_unsigned(c_TRIGGER_X_STEP, c_HDMI_H_BITWIDTH - triggerXPos'length) * triggerXPos;
 
 	-- Set the active signal for the X and Y position
 	trigger_active_x <= '1' when disp_x = triggerXPos_calced and disp_y > c_TRIGGER_Y_POS_MIN else '0';
