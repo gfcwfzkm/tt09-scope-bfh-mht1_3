@@ -143,7 +143,7 @@
       "SubInsts" : [
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/measurement_sm.vhdl",
-        "InstLine" : 409,
+        "InstLine" : 406,
         "InstName" : "SAMPLES_STORAGE",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/samples_memory/fram.vhdl",
         "ModuleLine" : 19,
@@ -161,7 +161,7 @@
        },
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/measurement_sm.vhdl",
-        "InstLine" : 431,
+        "InstLine" : 428,
         "InstName" : "SAMPLES_ADC",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/adc/pmodAD1.vhdl",
         "ModuleLine" : 18,
@@ -169,7 +169,7 @@
        },
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/measurement_sm.vhdl",
-        "InstLine" : 444,
+        "InstLine" : 441,
         "InstName" : "TRIGGER",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/measurements/trigger_detection.vhdl",
         "ModuleLine" : 19,
@@ -237,7 +237,7 @@
       "SubInsts" : [
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/serial_out/print_settings.vhdl",
-        "InstLine" : 184,
+        "InstLine" : 209,
         "InstName" : "UART_TX_MODULE",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/serial_out/uart_tx.vhdl",
         "ModuleLine" : 16,

@@ -55,7 +55,9 @@ architecture rtl of print_settings is
 	end component;
 
 	--! Data package size
-	constant PKG_SIZE	: integer := 16;
+	constant PKG_SIZE	: integer := 15;
+	--! Welcome message size
+	constant WELCOME_SIZE : integer := 49;
 	--! ASCII character R
 	constant ASCII_R	: std_logic_vector(7 downto 0) := x"52";
 	--! ASCII character F
@@ -76,11 +78,22 @@ architecture rtl of print_settings is
 	constant NEW_LINE : std_logic_vector(7 downto 0) := x"0A";
 
 	--! Data package type
-	type data_pkg is array(0 to PKG_SIZE-1) of std_logic_vector(7 downto 0);
+	type data_pkg is array(integer range<>) of std_logic_vector(7 downto 0);
 	--! State Machine states
 	type state_type is (
-		SEND_DATA,		--! Send data package
-		WAIT_FOR_UART	--! Wait for UART to finish sending
+		WELCOME,				--! Print welcome message
+		WAIT_FOR_UART_WELCOME,	--! Wait for UART to finish sending welcome message
+		SEND_DATA,				--! Send data package
+		WAIT_FOR_UART			--! Wait for UART to finish sending
+	);
+
+	--! Welcome message: \CR\LFWelcome to the TT09-SCOPE-BFH-MHT1_3 project!\CR\LF
+	constant welcome_message : data_pkg(0 to WELCOME_SIZE-1) := (
+		x"0A", x"0D", x"21", x"74", x"63", x"65", x"6A", x"6F", x"72", x"70", x"20",
+		x"33", x"5F", x"31", x"54", x"48", x"4D", x"2D", x"48", x"46", x"42", x"2D",
+		x"45", x"50", x"4F", x"43", x"53", x"2D", x"39", x"30", x"54", x"54", x"20",
+		x"65", x"68", x"74", x"20", x"6F", x"74", x"20", x"65", x"6D", x"6F", x"63",
+		x"6C", x"65", x"57", x"0A", x"0D"
 	);
 
 	--! Trigger edge setting as ASCII character
@@ -108,12 +121,12 @@ architecture rtl of print_settings is
 	signal uart_data_to_send : std_logic_vector(7 downto 0);
 
 	--! Package counter register
-	signal pkg_counter_next, pkg_counter_reg : unsigned(integer(ceil(log2(real(PKG_SIZE))))-1 downto 0);
+	signal pkg_counter_next, pkg_counter_reg : unsigned(integer(ceil(log2(real(WELCOME_SIZE))))-1 downto 0);
 	--! State Machine register
 	signal state_reg, state_next : state_type;
 
 	--! Data package
-	signal data_package : data_pkg;
+	signal data_package : data_pkg(0 to PKG_SIZE-1);
 begin
 
 	-- Convert the settings to ASCII characters
@@ -127,29 +140,28 @@ begin
 	waveform_setting <= std_logic_vector(resize(waveform, 8)) or ASCII_0;
 
 	-- Assign the converted settings to the data package
-	data_package(0) <= NEW_LINE;
-	data_package(1) <= CARRIAGE_RETURN;
-	data_package(2) <= waveform_setting;
-	data_package(3) <= dsgFreqShift_setting;
-	data_package(4) <= ASCII_DOUBLEPOINT;
-	data_package(5) <= ASCII_W;
-	data_package(6) <= timebase_setting;
-	data_package(7) <= chOffset_setting;
-	data_package(8) <= chAmplitude_setting;
-	data_package(9) <= ASCII_DOUBLEPOINT;
-	data_package(10) <= ASCII_C;
-	data_package(11) <= trigger_y_setting;
-	data_package(12) <= trigger_x_setting;
-	data_package(13) <= trigger_edge_setting;
-	data_package(14) <= ASCII_DOUBLEPOINT;
-	data_package(15) <= ASCII_T;
+	data_package(0) <= CARRIAGE_RETURN;
+	data_package(1) <= waveform_setting;
+	data_package(2) <= dsgFreqShift_setting;
+	data_package(3) <= ASCII_DOUBLEPOINT;
+	data_package(4) <= ASCII_W;
+	data_package(5) <= timebase_setting;
+	data_package(6) <= chOffset_setting;
+	data_package(7) <= chAmplitude_setting;
+	data_package(8) <= ASCII_DOUBLEPOINT;
+	data_package(9) <= ASCII_C;
+	data_package(10) <= trigger_y_setting;
+	data_package(11) <= trigger_x_setting;
+	data_package(12) <= trigger_edge_setting;
+	data_package(13) <= ASCII_DOUBLEPOINT;
+	data_package(14) <= ASCII_T;
 
 	--! Register process and reset
 	CLKREG : process(clk, reset)
 	begin
 		if reset = '1' then
-			pkg_counter_reg <= to_unsigned(PKG_SIZE-1, pkg_counter_reg'length);
-			state_reg <= SEND_DATA;
+			pkg_counter_reg <= to_unsigned(WELCOME_SIZE-1, pkg_counter_reg'length);
+			state_reg <= WELCOME;
 		elsif rising_edge(clk) then
 			pkg_counter_reg <= pkg_counter_next;
 			state_reg <= state_next;
@@ -164,6 +176,19 @@ begin
 		uart_start <= '0';
 
 		case state_reg is
+			when WELCOME =>
+				uart_start <= '1';
+				state_next <= WAIT_FOR_UART_WELCOME;
+			when WAIT_FOR_UART_WELCOME =>
+				if uart_busy = '0' then
+					if pkg_counter_reg = 0 then
+						pkg_counter_next <= to_unsigned(PKG_SIZE-1, pkg_counter_reg'length);
+						state_next <= SEND_DATA;
+					else
+						pkg_counter_next <= pkg_counter_reg - 1;
+						state_next <= WELCOME;
+					end if;
+				end if;
 			when SEND_DATA =>
 				uart_start <= '1';
 				state_next <= WAIT_FOR_UART;
@@ -179,7 +204,7 @@ begin
 		end case;
 	end process STATEMACHINE;
 	
-	uart_data_to_send <= data_package(to_integer(unsigned(pkg_counter_reg)));
+	uart_data_to_send <= data_package(to_integer(unsigned(pkg_counter_reg))) when state_reg = SEND_DATA or state_reg = WAIT_FOR_UART else welcome_message(to_integer(unsigned(pkg_counter_reg)));
 
 	UART_TX_MODULE : uart_tx
 		port map (
