@@ -59,9 +59,9 @@ architecture rtl of print_settings is
 	--! Welcome message size
 	constant WELCOME_SIZE : integer := 49;
 	--! ASCII character R
-	constant ASCII_R	: std_logic_vector(7 downto 0) := x"46";
+	constant ASCII_R	: std_logic_vector(7 downto 0) := x"52";
 	--! ASCII character F
-	constant ASCII_F	: std_logic_vector(7 downto 0) := x"52";
+	constant ASCII_F	: std_logic_vector(7 downto 0) := x"46";
 	--! ASCII character 0
 	constant ASCII_0	: std_logic_vector(7 downto 0) := x"30";
 	--! ASCII character T
@@ -130,7 +130,7 @@ architecture rtl of print_settings is
 begin
 
 	-- Convert the settings to ASCII characters
-	trigger_edge_setting <= ASCII_R when triggerOnRisingEdge = '1' else ASCII_F;
+	trigger_edge_setting <= ASCII_R when triggerOnRisingEdge = '0' else ASCII_F;
 	trigger_x_setting <= std_logic_vector(resize(triggerXPos, 8)) or ASCII_0;
 	trigger_y_setting <= std_logic_vector(resize(triggerYPos, 8)) or ASCII_0;
 	chAmplitude_setting <= std_logic_vector(resize(unsigned(chAmplitude), 8)) or ASCII_0;
