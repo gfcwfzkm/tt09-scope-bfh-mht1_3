@@ -59,9 +59,9 @@ architecture rtl of print_settings is
 	--! Welcome message size
 	constant WELCOME_SIZE : integer := 49;
 	--! ASCII character R
-	constant ASCII_R	: std_logic_vector(7 downto 0) := x"52";
+	constant ASCII_R	: std_logic_vector(7 downto 0) := x"46";
 	--! ASCII character F
-	constant ASCII_F	: std_logic_vector(7 downto 0) := x"46";
+	constant ASCII_F	: std_logic_vector(7 downto 0) := x"52";
 	--! ASCII character 0
 	constant ASCII_0	: std_logic_vector(7 downto 0) := x"30";
 	--! ASCII character T
