@@ -85,7 +85,7 @@
       "SubInsts" : [
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl",
-        "InstLine" : 314,
+        "InstLine" : 334,
         "InstName" : "BUTTON_DEBOUNCER[0].DEBOUNCE_BUTTONS",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/debouncer.vhdl",
         "ModuleLine" : 19,
@@ -93,7 +93,7 @@
        },
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl",
-        "InstLine" : 314,
+        "InstLine" : 334,
         "InstName" : "BUTTON_DEBOUNCER[1].DEBOUNCE_BUTTONS",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/debouncer.vhdl",
         "ModuleLine" : 19,
@@ -101,7 +101,7 @@
        },
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl",
-        "InstLine" : 314,
+        "InstLine" : 334,
         "InstName" : "BUTTON_DEBOUNCER[2].DEBOUNCE_BUTTONS",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/debouncer.vhdl",
         "ModuleLine" : 19,
@@ -109,7 +109,7 @@
        },
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl",
-        "InstLine" : 314,
+        "InstLine" : 334,
         "InstName" : "BUTTON_DEBOUNCER[3].DEBOUNCE_BUTTONS",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/debouncer.vhdl",
         "ModuleLine" : 19,
@@ -117,7 +117,7 @@
        },
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl",
-        "InstLine" : 328,
+        "InstLine" : 348,
         "InstName" : "SWITCH_DEBOUNCER[0].DEBOUNCE_SWITCHES",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/debouncer.vhdl",
         "ModuleLine" : 19,
@@ -125,7 +125,7 @@
        },
        {
         "InstFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/settings.vhdl",
-        "InstLine" : 328,
+        "InstLine" : 348,
         "InstName" : "SWITCH_DEBOUNCER[1].DEBOUNCE_SWITCHES",
         "ModuleFile" : "C:/Users/pasca/OneDrive/Schule_BFH/5_Semester/TinyTapeoutProjekt/git/tt09-scope-bfh-mht1_3/src/settings/debouncer.vhdl",
         "ModuleLine" : 19,

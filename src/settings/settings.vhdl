@@ -158,6 +158,12 @@ architecture rtl of settings is
 	signal dsgFreqShift_reg, dsgFreqShift_next : unsigned(dsgFreqShift'length-1 downto 0);
 	--! Selected Waveform
 	signal selectedWaveform_reg, selectedWaveform_next : unsigned(1 downto 0);
+
+	--! Syncronizing signals for the buttons and switches
+	signal button_ff_stage_1_reg, button_ff_stage_1_next : std_logic_vector(3 downto 0);
+	signal button_ff_stage_2_reg, button_ff_stage_2_next : std_logic_vector(3 downto 0);
+	signal switches_ff_stage_1_reg, switches_ff_stage_1_next : std_logic_vector(1 downto 0);
+	signal switches_ff_stage_2_reg, switches_ff_stage_2_next : std_logic_vector(1 downto 0);
 begin
 
 	--! Clocked registers for the settings
@@ -173,6 +179,10 @@ begin
 			triggerOnRisingEdge_reg <= TRIGGER_ON_RISING_EDGE_DEFAULT;
 			dsgFreqShift_reg <= DSG_FREQ_SHIFT_DEFAULT;
 			selectedWaveform_reg <= WAVEFORM_DEFAULT;
+			button_ff_stage_1_reg <= (others => '0');
+			button_ff_stage_2_reg <= (others => '0');
+			switches_ff_stage_1_reg <= (others => '0');
+			switches_ff_stage_2_reg <= (others => '0');
 		elsif rising_edge(clk) then
 			chAmplitude_reg <= chAmplitude_next;
 			chOffset_reg <= chOffset_next;
@@ -183,6 +193,10 @@ begin
 			triggerOnRisingEdge_reg <= triggerOnRisingEdge_next;
 			dsgFreqShift_reg <= dsgFreqShift_next;
 			selectedWaveform_reg <= selectedWaveform_next;
+			button_ff_stage_1_reg <= button_ff_stage_1_next;
+			button_ff_stage_2_reg <= button_ff_stage_2_next;
+			switches_ff_stage_1_reg <= switches_ff_stage_1_next;
+			switches_ff_stage_2_reg <= switches_ff_stage_2_next;
 		end if;
 	end process CLKREG;
 
@@ -309,13 +323,19 @@ begin
 	dsgFreqShift <= dsgFreqShift_reg;
 	waveform <= selectedWaveform_reg;
 
+	-- Syncronize the buttons and switches
+	button_ff_stage_1_next <= buttons;
+	button_ff_stage_2_next <= button_ff_stage_1_reg;
+	switches_ff_stage_1_next <= switches;
+	switches_ff_stage_2_next <= switches_ff_stage_1_reg;
+
 	--! Debounce the buttons
 	BUTTON_DEBOUNCER : for i in 0 to 3 generate
 		DEBOUNCE_BUTTONS : debouncer
 		port map (
 			clk => clk,
 			reset => reset,
-			in_raw => buttons(i),
+			in_raw => button_ff_stage_2_reg(i),
 			deb_en => sample_inputs,
 			debounced => open,
 			released => open,
@@ -329,7 +349,7 @@ begin
 		port map (
 			clk => clk,
 			reset => reset,
-			in_raw => switches(i),
+			in_raw => switches_ff_stage_2_reg(i),
 			deb_en => sample_inputs,
 			debounced => debounced_switches(i),
 			released => open,
