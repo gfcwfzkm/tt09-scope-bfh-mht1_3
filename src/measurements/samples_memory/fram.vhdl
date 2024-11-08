@@ -63,9 +63,11 @@ end entity fram;
 
 architecture rtl of fram is
 	--! 60ns deselect time for the FRAM memory
-	constant FRAM_DESELECT_TIME : positive := integer(1.0 / real(60 * 10.0**(-9)));	
+	constant FRAM_DESELECT_TIME : positive := positive(1.0 / real(60 * 10.0**(-9)));	
 	--! Counter value to deselect the FRAM memory based on the deselect time and the FPGA clock frequency
-	constant FRAM_DESELECT_COUNTER : positive := integer(F_CLK / FRAM_DESELECT_TIME);
+	constant FRAM_DESELECT_COUNTER : positive := positive(F_CLK / FRAM_DESELECT_TIME);
+	--! Bits needed for the deselect counter
+	constant FRAM_DESELECT_COUNTER_BITS : integer := integer(ceil(log2(real(FRAM_DESELECT_COUNTER)))) + 1;
 	--! FRAM SPI Read Opcode
 	constant FRAM_OPCODE_READ	: std_logic_vector(7 downto 0) := "00000011";
 	--! FRAM SPI Write Opcode
@@ -100,19 +102,20 @@ architecture rtl of fram is
 	--! Transaction state register
 	signal transaction_state_reg, transaction_state_next : transaction_state;
 	--! Deselect counter register
-	signal nCS_counter_reg, nCS_counter_next : unsigned(integer(ceil(log2(real(FRAM_DESELECT_COUNTER)))) downto 0) := (others => '0');
+	signal nCS_counter_reg, nCS_counter_next : unsigned(FRAM_DESELECT_COUNTER_BITS-1 downto 0);
 
 	--! SPI busy signal
-	signal spi_busy : std_logic := '0';
+	signal spi_busy : std_logic;
 	--! SPI multiple read/write signal
-	signal spi_multiple_rw : std_logic := '0';
+	signal spi_multiple_rw : std_logic;
 	--! SPI start signal
-	signal spi_start : std_logic := '0';
+	signal spi_start : std_logic;
 	--! SPI data to be sent to the FRAM
-	signal spi_data_to_fram : std_logic_vector(7 downto 0) := (others => '0');
+	signal spi_data_to_fram : std_logic_vector(7 downto 0);
 	--! SPI data received from the FRAM
-	signal spi_data_from_fram : std_logic_vector(7 downto 0) := (others => '0');
+	signal spi_data_from_fram : std_logic_vector(7 downto 0);
 
+	--! SPI Master Component
 	component spi_master
 		port (
 		  	clk : in std_logic;
@@ -132,18 +135,16 @@ begin
 
 	data_from_fram <= spi_data_from_fram;
 	
-	with state_reg select fram_busy <=
-		'0' when IDLE,
-		'1' when SEND_WREN_OPCODE,
-		'1' when RESTART_SPI,
-		'1' when SEND_ADDR_H,
-		'1' when SEND_ADDR_L,
-		'1' when SEND_DATA,
-		'1' when READ_DATA,
-		'1' when WAIT_MULTIPLE_RW,
-		'1' when FINISH,
-		'1' when FINISH_MULTIPLE_RW,
-		'0' when others;
+	fram_busy <= '0' when state_reg = IDLE else '1';
+	--with state_reg select fram_busy <=
+	--	'0' when IDLE,
+	--	'1' when SEND_WREN_OPCODE | RESTART_SPI | SEND_ADDR_H | SEND_ADDR_L,
+	--	'1' when SEND_DATA,
+	--	'1' when READ_DATA,
+	--	'1' when WAIT_MULTIPLE_RW,
+	--	'1' when FINISH,
+	--	'1' when FINISH_MULTIPLE_RW,
+	--	'0' when others;
 
 	--! Clocked registers and reset logic
 	CLKREG : process(clk, reset) is begin
@@ -322,7 +323,6 @@ begin
 				state_next <= IDLE;
 				report "Invalid state reached"
 					severity FAILURE;
-				
 		end case;
 	end process STATEMACHINE;
 

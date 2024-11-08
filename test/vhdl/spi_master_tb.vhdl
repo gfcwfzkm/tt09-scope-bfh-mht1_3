@@ -58,7 +58,8 @@ begin
 
 	dut : spi_master
 		generic map (
-			LSB_FIRST => false
+			MSB_FIRST => true,
+			NBITS => 8
 		)
 		port map (
 			clk => dut_clk,

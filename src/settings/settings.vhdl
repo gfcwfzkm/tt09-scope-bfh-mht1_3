@@ -50,7 +50,7 @@ entity settings is
 		--! Trigger Y position setting (16 pixels per trigger position)
 		triggerYPos : out unsigned(3 downto 0);
 		--! Timebase setting (0: 1x, 1: 1/2x, 2: 1/4x, 3: 1/8x, 4: 1/16x, 5: 1/32x, 6: 1/64x, 7: 1/128x)
-		timebase : out unsigned(2 downto 0);
+		time_base : out unsigned(2 downto 0);
 		--! Memory shift setting (Shifts the memory start position to the right or left)
 		memoryShift : out signed(8 downto 0);
 		--! DSG frequency shift setting (Shifts the DSG frequency up or down)
@@ -97,12 +97,12 @@ architecture rtl of settings is
 	constant TRIGGER_Y_MAX : unsigned(triggerYPos'length-1 downto 0)		:= to_unsigned(15,	triggerYPos'length);
 	--! Minimum Trigger Y Position
 	constant TRIGGER_Y_MIN : unsigned(triggerYPos'length-1 downto 0)		:= to_unsigned(0,	triggerYPos'length);
-	--! Default Timebase
-	constant TIMEBASE_DEFAULT : unsigned(timebase'length-1 downto 0)		:= to_unsigned(0,	timebase'length);
-	--! Maximum Timebase
-	constant TIMEBASE_MAX : unsigned(timebase'length-1 downto 0)			:= to_unsigned(7,	timebase'length);
-	--! Minimum Timebase
-	constant TIMEBASE_MIN : unsigned(timebase'length-1 downto 0)			:= to_unsigned(0,	timebase'length);
+	--! Default time base
+	constant TIME_BASE_DEFAULT : unsigned(time_base'length-1 downto 0)		:= to_unsigned(0,	time_base'length);
+	--! Maximum time base
+	constant TIME_BASE_MAX : unsigned(time_base'length-1 downto 0)			:= to_unsigned(7,	time_base'length);
+	--! Minimum time base
+	constant TIME_BASE_MIN : unsigned(time_base'length-1 downto 0)			:= to_unsigned(0,	time_base'length);
 	--! Default Memory Shift
 	constant MEMORY_SHIFT_DEFAULT : signed(memoryShift'length-1 downto 0)	:= to_signed(0,		memoryShift'length);
 	--! Maximum Memory Shift
@@ -148,8 +148,8 @@ architecture rtl of settings is
 	signal triggerXPos_reg, triggerXPos_next : unsigned(triggerXPos'length-1 downto 0);
 	--! Register for the trigger Y position setting
 	signal triggerYPos_reg, triggerYPos_next : unsigned(triggerYPos'length-1 downto 0);
-	--! Register for the timebase setting
-	signal timebase_reg, timebase_next : unsigned(timebase'length-1 downto 0);
+	--! Register for the time_base setting
+	signal time_base_reg, time_base_next : unsigned(time_base'length-1 downto 0);
 	--! Register for the memory shift setting
 	signal memoryShift_reg, memoryShift_next : signed(memoryShift'length-1 downto 0);
 	--! Register for the trigger on rising edge setting
@@ -174,7 +174,7 @@ begin
 			chOffset_reg <=OFFSET_DEFAULT;
 			triggerXPos_reg <= TRIGGER_X_DEFAULT;
 			triggerYPos_reg <= TRIGGER_Y_DEFAULT;
-			timebase_reg <= TIMEBASE_DEFAULT;
+			time_base_reg <= TIME_BASE_DEFAULT;
 			memoryShift_reg <= MEMORY_SHIFT_DEFAULT;
 			triggerOnRisingEdge_reg <= TRIGGER_ON_RISING_EDGE_DEFAULT;
 			dsgFreqShift_reg <= DSG_FREQ_SHIFT_DEFAULT;
@@ -188,7 +188,7 @@ begin
 			chOffset_reg <= chOffset_next;
 			triggerXPos_reg <= triggerXPos_next;
 			triggerYPos_reg <= triggerYPos_next;
-			timebase_reg <= timebase_next;
+			time_base_reg <= time_base_next;
 			memoryShift_reg <= memoryShift_next;
 			triggerOnRisingEdge_reg <= triggerOnRisingEdge_next;
 			dsgFreqShift_reg <= dsgFreqShift_next;
@@ -202,13 +202,13 @@ begin
 
 	--! State machine process for the settings
 	NSL : process(debounced_buttons_pressed, debounced_switches, chAmplitude_reg, chOffset_reg, triggerXPos_reg,
-				  triggerYPos_reg, timebase_reg, memoryShift_reg, triggerOnRisingEdge_reg, dsgFreqShift_reg, selectedWaveform_reg) is
+				  triggerYPos_reg, time_base_reg, memoryShift_reg, triggerOnRisingEdge_reg, dsgFreqShift_reg, selectedWaveform_reg) is
 	begin
 		chAmplitude_next <= chAmplitude_reg;
 		chOffset_next <= chOffset_reg;
 		triggerXPos_next <= triggerXPos_reg;
 		triggerYPos_next <= triggerYPos_reg;
-		timebase_next <= timebase_reg;
+		time_base_next <= time_base_reg;
 		memoryShift_next <= memoryShift_reg;
 		triggerOnRisingEdge_next <= triggerOnRisingEdge_reg;
 		dsgFreqShift_next <= dsgFreqShift_reg;
@@ -263,13 +263,13 @@ begin
 			when BTN_LAYOUT_3 =>
 				if debounced_buttons_pressed(0) = '1' then
 					-- Button 0: Timebase up
-					if timebase_reg /= TIMEBASE_MAX then
-						timebase_next <= timebase_reg + 1;
+					if time_base_reg /= TIME_BASE_MAX then
+						time_base_next <= time_base_reg + 1;
 					end if;
 				elsif debounced_buttons_pressed(1) = '1' then
 					-- Button 1: Timebase down
-					if timebase_reg /= TIMEBASE_MIN then
-						timebase_next <= timebase_reg - 1;
+					if time_base_reg /= TIME_BASE_MIN then
+						time_base_next <= time_base_reg - 1;
 					end if;
 				elsif debounced_buttons_pressed(2) = '1' then
 					-- Button 2: Memory shift up/right
@@ -316,7 +316,7 @@ begin
 	chOffset <= chOffset_reg;
 	triggerXPos <= triggerXPos_reg;
 	triggerYPos <= triggerYPos_reg;
-	timebase <= timebase_reg;
+	time_base <= time_base_reg;
 	memoryShift <= memoryShift_reg;
 	triggerOnRisingEdge <= triggerOnRisingEdge_reg;
 	displayDotSamples <= DISPLAY_DOT_SAMPLES_DEFAULT;

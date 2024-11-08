@@ -31,7 +31,7 @@ entity print_settings is
 		--! Channel offset setting
 		chOffset			: in unsigned(4 downto 0);
 		--! Timebase setting
-		timebase			: in unsigned(2 downto 0);
+		time_base			: in unsigned(2 downto 0);
 		--! DSG frequency shift setting
 		dsgFreqShift		: in unsigned(1 downto 0);
 		--! Waveform setting
@@ -107,7 +107,7 @@ architecture rtl of print_settings is
 	--! Channel offset setting as ASCII character
 	signal chOffset_setting : std_logic_vector(7 downto 0);
 	--! Timebase setting as ASCII character
-	signal timebase_setting : std_logic_vector(7 downto 0);
+	signal time_base_setting : std_logic_vector(7 downto 0);
 	--! DSG frequency shift setting as ASCII character
 	signal dsgFreqShift_setting : std_logic_vector(7 downto 0);
 	--! Waveform setting as ASCII character
@@ -135,7 +135,7 @@ begin
 	trigger_y_setting <= std_logic_vector(resize(triggerYPos, 8)) or ASCII_0;
 	chAmplitude_setting <= std_logic_vector(resize(unsigned(chAmplitude), 8)) or ASCII_0;
 	chOffset_setting <= std_logic_vector(resize(chOffset, 8)) or ASCII_0;
-	timebase_setting <= std_logic_vector(resize(timebase, 8)) or ASCII_0;
+	time_base_setting <= std_logic_vector(resize(time_base, 8)) or ASCII_0;
 	dsgFreqShift_setting <= std_logic_vector(resize(dsgFreqShift, 8)) or ASCII_0;
 	waveform_setting <= std_logic_vector(resize(waveform, 8)) or ASCII_0;
 
@@ -145,7 +145,7 @@ begin
 	data_package(2) <= dsgFreqShift_setting;
 	data_package(3) <= ASCII_DOUBLEPOINT;
 	data_package(4) <= ASCII_W;
-	data_package(5) <= timebase_setting;
+	data_package(5) <= time_base_setting;
 	data_package(6) <= chOffset_setting;
 	data_package(7) <= chAmplitude_setting;
 	data_package(8) <= ASCII_DOUBLEPOINT;

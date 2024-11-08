@@ -64,7 +64,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			chOffset : out unsigned(4 downto 0);
 			triggerXPos : out unsigned(2 downto 0);
 			triggerYPos : out unsigned(3 downto 0);
-			timebase : out unsigned(2 downto 0);
+			time_base : out unsigned(2 downto 0);
 			memoryShift : out signed(8 downto 0);
 			dsgFreqShift : out unsigned(1 downto 0);
 			waveform : out unsigned(1 downto 0)
@@ -80,7 +80,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			line_end : in std_logic;
 			triggerXPos : in unsigned(2 downto 0);
 			triggerYPos : in unsigned(3 downto 0);
-			timebase : in unsigned(2 downto 0);
+			time_base : in unsigned(2 downto 0);
 			memoryShift : in signed(8 downto 0);
 			display_x : in unsigned(9 downto 0);
 			triggerOnRisingEdge : in std_logic;
@@ -119,7 +119,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 			triggerYPos : in unsigned(3 downto 0);
 			chAmplitude : in signed(2 downto 0);
 			chOffset : in unsigned(4 downto 0);
-			timebase : in unsigned(2 downto 0);
+			time_base : in unsigned(2 downto 0);
 			dsgFreqShift : in unsigned(1 downto 0);
 			waveform : in unsigned(1 downto 0);
 			tx : out std_logic
@@ -136,7 +136,7 @@ architecture Behavioral of tt_um_gfcwfzkm_scope_bfh_mht1_3 is
 	signal chOffset		  : unsigned(4 downto 0);
 	signal triggerXPos	  : unsigned(2 downto 0);
 	signal triggerYPos	  : unsigned(3 downto 0);
-	signal timebase		  : unsigned(2 downto 0);
+	signal time_base	  : unsigned(2 downto 0);
 	signal memoryShift	  : signed(8 downto 0);
 	signal triggerOnRisingEdge : std_logic;
 	signal displayDotSamples : std_logic;
@@ -204,7 +204,7 @@ begin
 			chOffset	=> chOffset,
 			triggerXPos	=> triggerXPos,
 			triggerYPos	=> triggerYPos,
-			timebase	=> timebase,
+			time_base	=> time_base,
 			memoryShift	=> memoryShift,
 			dsgFreqShift => dsgFreqShift,
 			waveform	=> waveform
@@ -220,7 +220,7 @@ begin
 			line_end	=> line_end,
 			triggerXPos	=> triggerXPos,
 			triggerYPos	=> triggerYPos,
-			timebase	=> timebase,
+			time_base	=> time_base,
 			memoryShift	=> memoryShift,
 			display_x	=> display_x,
 			triggerOnRisingEdge => triggerOnRisingEdge,
@@ -259,7 +259,7 @@ begin
 			triggerYPos			=> triggerYPos,
 			chAmplitude			=> chAmplitude,
 			chOffset			=> chOffset,
-			timebase			=> timebase,
+			time_base			=> time_base,
 			dsgFreqShift		=> dsgFreqShift,
 			waveform			=> waveform,
 			tx					=> uo_out(3)

@@ -54,11 +54,15 @@ entity spi_master is
 end entity spi_master;
 
 architecture rtl of spi_master is
+	--! Lowest bit will be used as clock divider, remaining bits are the length of the data (NBITS)
+	constant SPI_CYCLE_COUNTER_BITS : integer := integer(ceil(log2(real(2*NBITS))));
+	constant SPI_CYCLE_COUNTER_MAX : unsigned(SPI_CYCLE_COUNTER_BITS-1 downto 0) := (others => '1'); 
+
 	--! SPI state machine states
 	type spi_state is (
-		IDLE,		--! Idle state
-		TRANSCEIVE,	--! Transceive state
-		DONE		--! Done state
+		IDLE,		--! SPI Master idle, ready for a new transaction
+		TRANSCEIVE,	--! SPI Master busy receiving and sending data
+		DONE		--! SPI Master wrapping up the communication
 	);
 
 	--! State register and next state
@@ -66,11 +70,13 @@ architecture rtl of spi_master is
 
 	--! Reverse bit order if MSB_FIRST is set
 	signal data_in_MSB, data_out_MSB : std_logic_vector(NBITS-1 downto 0);
+	signal data_in_ordered : std_logic_vector(NBITS-1 downto 0);
 
 	--! Shift register and shift cycle counter
-	signal shift_cycle_reg, shift_cycle_next : unsigned(3 downto 0);
+	signal shift_cycle_reg, shift_cycle_next : unsigned(SPI_CYCLE_COUNTER_BITS-1 downto 0); 
 
-	--! Shift register and next shift register
+	--! Shift register and next shift register.
+	--! The data will be loaded in the lowest NBITS, while the MSB is used to read the data in
 	signal shift_reg, shift_next : std_logic_vector(NBITS downto 0);
 begin
 
@@ -79,13 +85,25 @@ begin
 	mosi <= shift_reg(0);
 	busy <= '1' when state_reg = TRANSCEIVE else '0';
 	cs <= '1' when state_reg = IDLE else '0';
-	data_out <= data_out_MSB;
 
-	--! Reverse the data_in signal if the MSB_FIRST generic is set
-	REVERSE_ORDER : for i in NBITS-1 downto 0 generate
-		data_in_MSB(NBITS-1 - i) <= data_in(i);
-		data_out_MSB(NBITS-1 - i) <= shift_reg(i);
+	--! If MSB_FIRST is set to TRUE, reverse the data order, as the SPI master is LSB-First by default
+	USE_MSB_ORDERING : if MSB_FIRST = TRUE generate
+		--! Reverse the data_in signal if the MSB_FIRST generic is set
+		REVERSE_ORDER : for i in NBITS-1 downto 0 generate
+			data_in_MSB(NBITS-1 - i) <= data_in(i);
+			data_out_MSB(NBITS-1 - i) <= shift_reg(i);
+		end generate;
+		
+		data_out <= data_out_MSB;
+		data_in_ordered <= data_in_MSB;
 	end generate;
+	
+	--! If MSB_FIRST is set to FALSE, use the data as is (SPI master is LSB-First by default)
+	USE_LSB_ORDERING : if MSB_FIRST = FALSE generate
+		data_out <= shift_reg(NBITS-1 downto 0);
+		data_in_ordered <= data_in;
+	end generate;
+	
 
 	--! Clock and reset process
 	CLKREG : process(clk, reset) begin
@@ -101,7 +119,7 @@ begin
 	end process CLKREG;
 
 	--! SPI state machine
-	NSL : process (state_reg, shift_reg, shift_cycle_reg, start, busy_wait, miso, data_in_MSB) begin
+	NSL : process (state_reg, shift_reg, shift_cycle_reg, start, busy_wait, miso, data_in_ordered) begin
 		state_next <= state_reg;
 		shift_next <= shift_reg;
 		shift_cycle_next <= shift_cycle_reg;
@@ -113,15 +131,11 @@ begin
 					shift_cycle_next <= (others => '0');
 
 					-- Load the data into the shift register
-					if MSB_FIRST then
-						shift_next <= ('0' & data_in_MSB);
-					else
-						shift_next <= ('0' & data_in);
-					end if;
+					shift_next <= '0' & data_in_ordered;
 				end if;
 			when TRANSCEIVE =>
 				-- Check if the shift cycle counter has reached the end
-				if shift_cycle_reg = "1111" then
+				if shift_cycle_reg = SPI_CYCLE_COUNTER_MAX then
 					state_next <= DONE;
 				end if;
 
@@ -147,11 +161,7 @@ begin
 						shift_cycle_next <= (others => '0');
 
 						-- Load the data into the shift register
-						if MSB_FIRST then
-							shift_next <= ('0' & data_in_MSB);
-						else
-							shift_next <= ('0' & data_in);
-						end if;
+						shift_next <= '0' & data_in_ordered;
 					end if;
 				else
 					state_next <= IDLE;
@@ -159,4 +169,4 @@ begin
 		end case;
 	end process NSL;
 
-end architecture;
+end architecture rtl;
