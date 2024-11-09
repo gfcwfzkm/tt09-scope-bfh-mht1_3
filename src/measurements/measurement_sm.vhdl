@@ -363,8 +363,7 @@ begin
 				end if;
 			when WRAP_UP_MEASUREMENT =>
 				-- Memorize the trigger settings and the start address (used for the sample start address calculation)
-				-- @TODO CLEANUP address_counter_next <= to_unsigned(TRIGGER_X_OFFSET, address_counter_next'length - triggerXPos'length) * triggerXPos;
-				address_counter_next <= resize(TRIGGER_X_OFFSET * triggerXPos, address_counter_next'length);
+				address_counter_next <= to_unsigned(TRIGGER_X_OFFSET, address_counter_next'length - triggerXPos'length) * triggerXPos;
 				state_next <= WAIT_FOR_LINE_END;
 			when others =>
 				-- Should never happen!

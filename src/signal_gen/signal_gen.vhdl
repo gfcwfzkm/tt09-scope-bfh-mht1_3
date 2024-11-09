@@ -156,6 +156,8 @@ begin
 				-- Increment the counter and move back to Idle
 				sig_counter_next <= next_counter;
 				state_next <= IDLE;
+			when others =>
+				state_next <= IDLE;
 		end case;
 	end process WAVEFORM_GEN_NSL;
 

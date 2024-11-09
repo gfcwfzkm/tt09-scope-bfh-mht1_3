@@ -114,6 +114,8 @@ begin
 			when DONE =>
 				sclk_next <= '0';				
 				state_next <= IDLE;
+			when others =>
+				state_next <= IDLE;
 		end case;
 	end process FSM;
 

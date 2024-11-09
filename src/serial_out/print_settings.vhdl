@@ -201,6 +201,8 @@ begin
 					end if;
 					state_next <= SEND_DATA;
 				end if;
+			when others =>
+				state_next <= WELCOME;
 		end case;
 	end process STATEMACHINE;
 	

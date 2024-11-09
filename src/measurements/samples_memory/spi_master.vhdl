@@ -166,6 +166,8 @@ begin
 				else
 					state_next <= IDLE;
 				end if;
+			when others =>
+				state_next <= IDLE;
 		end case;
 	end process NSL;
 
