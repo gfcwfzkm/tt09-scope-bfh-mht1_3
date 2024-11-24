@@ -45,7 +45,7 @@ entity settings is
 		chAmplitude : out signed(2 downto 0);
 		--! Channel offset setting (moves the samples up or down on the screen)
 		chOffset : out unsigned(4 downto 0);
-		--! Trigger X position setting (32 pixels per trigger position)
+		--! Trigger X position setting (60 pixels per trigger position)
 		triggerXPos : out unsigned(2 downto 0);
 		--! Trigger Y position setting (16 pixels per trigger position)
 		triggerYPos : out unsigned(3 downto 0);

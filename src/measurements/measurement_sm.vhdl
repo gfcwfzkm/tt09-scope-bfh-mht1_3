@@ -28,7 +28,7 @@ entity measurement_sm is
 		frame_end		: in std_logic;
 		--! Image line end signal
 		line_end		: in std_logic;
-		--! Trigger X position, multiplied by 32 if applied onto the screen / sample
+		--! Trigger X position, multiplied by 60 if applied onto the screen / sample
 		triggerXPos		: in unsigned(2 downto 0);
 		--! Trigger Y position, multiplied by 16 if applied onto the screen / sample
 		triggerYPos		: in unsigned(3 downto 0);
