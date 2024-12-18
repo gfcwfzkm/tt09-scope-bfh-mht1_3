@@ -123,6 +123,7 @@ begin
 		variable seed1, seed2 : positive := 42;
 		variable randomValue : real := 0.0;
 	begin
+		report "Start of the pmodDA2 testbench" severity NOTE;
 
 		wait for 10 ns;
 		tb_reset <= '0';
@@ -133,8 +134,7 @@ begin
 			check_DA2(std_logic_vector(to_unsigned(integer(randomValue * 255.0), 8)));
 		end loop;
 
-		report "Testbench finished" severity NOTE;
-
+		report "Finished all " & to_string(AMOUNT_OF_TESTS_I_DO) & " without errors" severity NOTE;
 		tb_finished <= true;
 		wait;
 

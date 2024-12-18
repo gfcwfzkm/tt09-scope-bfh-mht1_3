@@ -107,6 +107,8 @@ begin
 		variable seed1, seed2 : integer := 42;
 		variable randomADC : real := 0.0;
 	begin
+		report "Start of the pmodAD1 testbench" severity NOTE;
+		
 		wait for 10 ns;
 		tb_reset <= '0';
 		wait for 10 ns;
@@ -116,6 +118,7 @@ begin
 			sample_adc(std_logic_vector(to_unsigned(integer(randomADC * 65535.0), 16)));
 		end loop;
 
+		report "Finished all " & to_string(AMOUNT_OF_TESTS_I_DO) & " without errors" severity NOTE;
 		tb_finished <= TRUE;
 
 		wait;
