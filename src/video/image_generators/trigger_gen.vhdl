@@ -50,7 +50,7 @@ entity trigger_gen is
 end entity trigger_gen;
 
 architecture rtl of trigger_gen is
-	--! Trigger X position calculated (triggerXPos * 32)
+	--! Trigger X position calculated (triggerXPos * 60)
 	signal triggerXPos_calced : unsigned(c_HDMI_H_BITWIDTH-1 downto 0);
 	--! Trigger Y position calculated (triggerYPos * 16)
 	signal triggerYPos_shifted : unsigned(c_HDMI_V_BITWIDTH downto 0);
@@ -84,8 +84,7 @@ begin
 	triggerYPos_final <= triggerYPos_calced(c_HDMI_V_BITWIDTH-1 downto 0) when triggerYPos_calced(c_HDMI_V_BITWIDTH) = '0' else
 						 to_unsigned(c_DISPLAY_Y_MAX-1, c_HDMI_V_BITWIDTH);
 
-	-- Calculate the trigger X position by multiplying it by 64 and adding 48
-	-- triggerXPos_calced <= shift_left(resize(triggerXPos, c_HDMI_H_BITWIDTH), 6) + 48;
+	-- Calculate the trigger X position by multiplying it with 60
 	triggerXPos_calced <= to_unsigned(c_TRIGGER_X_STEP, c_HDMI_H_BITWIDTH - triggerXPos'length) * triggerXPos;
 
 	-- Set the active signal for the X and Y position

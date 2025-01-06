@@ -68,7 +68,7 @@ architecture rtl of channel_gen is
 	signal dotMode : std_logic;
 begin
 
-	-- Multiply the channel offset by 16 (offset moves in 16 pixel steps)
+	-- Multiply the channel offset by 32 (offset moves in 32 pixel steps)
 	offsetCalced <= shift_left(resize(unsigned(chOffset), c_HDMI_V_BITWIDTH), 5);
 
 	offset <= '1' when disp_x < to_unsigned(c_LINEWIDTH, c_HDMI_H_BITWIDTH) and disp_y = offsetCalced else '0';
