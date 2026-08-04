@@ -3,15 +3,15 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+from cocotb.triggers import ClockCycles, Timer
 
 
 @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, units="us")
+    # Set the clock period to 40 ns (25 MHz)
+    clock = Clock(dut.clk, 40, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -23,6 +23,11 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
 
-    # Empty otherwise, as this is just a dummy test to shut up the CI
+    dut._log.info("Running the design for half a second...")
+    # Run for 0.5 seconds (12,500,000 cycles at 25 MHz)
+    await ClockCycles(dut.clk, 12_500_000)
+    dut._log.info("Done!")
+
+    # Alternatively, wait directly by time duration:
+    # await Timer(0.5, units="sec")
